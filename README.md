@@ -13,16 +13,19 @@
 ## How to install:
 ```
 git clone https://github.com/nuhtan/minecraftAnalysis.git
-
+```
+```
 pip install git+https://github.com/nuhtan/anvil-parser.git
-
+```
+```
 cargo build
 ```
 
 ### Run either of the .py files as such:
 ```
 python program.py r.x.z.mca strategy
-
+```
+```
 python results.py
 ```
 where r.x.z.mca is one of the region files and strategy is either basic or poke.
