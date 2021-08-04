@@ -30,7 +30,19 @@ def standardBranchMining(region: Region, baseDirection: Direction, startingCoord
     if branchSpacing < 2:
         raise error("Branch spacing for branch mining should be at least 2 to avoid duplicates")
         
-    def corridorExpansion(coords: tuple((int, int, int))):
+    def corridorExpansion(coords: tuple[int, int, int]) -> tuple[list[simpleBlock], int]:
+        """
+        Expands the central corridor based on the branch spacing of the parent function
+
+        Parameters
+        ----------
+        coords
+            The xyz position of where the expansion should start
+
+        Returns
+        -------
+        A tuple consisting of a list of the blocks exposed and a count of the blocks that would need to be mined.
+        """
         blocks = []
         
         # duplicate handeling
@@ -47,9 +59,23 @@ def standardBranchMining(region: Region, baseDirection: Direction, startingCoord
         for n in range(2, branchSpacing):
             blocks += twoByOne(region, baseDirection, dirCoords(baseDirection, coords, n))
 
-        return tuple((blocks, 2 + (2 * branchSpacing)))
+        return tuple[blocks, 2 + (2 * branchSpacing)]
 
-    def branch(direction: Direction, coords: tuple((int, int, int))):
+    def branch(direction: Direction, coords: tuple[int, int, int]) -> tuple[list[simpleBlock], int]:
+        """
+        Simulates mining a branch in a direction
+
+        Parameters
+        ----------
+        direction
+            The direction that the branch should expand in
+        coords
+            The xyz position that the branch should start at
+
+        Returns
+        -------
+        A tuple consisting of a list of the blocks exposed and a count of the blocks that would need to be mined.
+        """
         blocks = []
         mined = 0
         for n in range(branchLength):
@@ -57,7 +83,7 @@ def standardBranchMining(region: Region, baseDirection: Direction, startingCoord
             mined += 2
 
         blocks += twoByOneEnd(region, direction, dirCoords(direction, coords, branchLength - 1))
-        return tuple((blocks, mined))
+        return tuple[blocks, mined]
 
     sumBlocks = []
     mined = 0
@@ -81,15 +107,21 @@ def standardBranchMining(region: Region, baseDirection: Direction, startingCoord
         sumBlocks += tempBlocks
         mined += tempmined
 
-    return tuple((sumBlocks, mined))
+    return tuple[sumBlocks, mined]
 
-def branchWithPokeHoles(region: Region, baseDirection: Direction, startingCoords: tuple((int, int, int)), numberOfBranchPairs: int, pokesPerBranch: int, pokeSpacing: int, branchSpacing: int) -> tuple[list[simpleBlock], int]:
+def branchWithPokeHoles(region: Region, baseDirection: Direction, startingCoords: tuple[int, int, int], numberOfBranchPairs: int, pokesPerBranch: int, pokeSpacing: int, branchSpacing: int) -> tuple[list[simpleBlock], int]:
+    """
+    
+    """
     if branchSpacing < 10:
         raise error("Branch spacing for branch mining with poke holes should be at least 10 to avoid duplicates")
     if pokeSpacing < 2:
         raise error("Poke spacing should be at least 2 to avoid duplicates")
 
-    def corridorExpansion(coords: tuple((int, int, int))):
+    def corridorExpansion(coords: tuple[int, int, int]):
+        """
+        
+        """
         blocks = []
         
         # duplicate handeling
@@ -108,7 +140,10 @@ def branchWithPokeHoles(region: Region, baseDirection: Direction, startingCoords
 
         return tuple((blocks, 2 + (2 * branchSpacing)))
 
-    def branch(direction: Direction, coords: tuple((int, int, int))):
+    def branch(direction: Direction, coords: tuple[int, int, int]):
+        """
+        
+        """
         blocks = []
         mined = 0
         for n in range(pokesPerBranch):
@@ -143,7 +178,7 @@ def branchWithPokeHoles(region: Region, baseDirection: Direction, startingCoords
             mined += 10 + (2 * pokeSpacing)
 
         blocks += twoByOneEnd(region, direction, dirCoords(direction, coords, (pokeSpacing * pokesPerBranch) - 1))
-        return tuple((blocks, mined))
+        return tuple[blocks, mined]
 
     sumBlocks = []
     mined = 0
@@ -167,4 +202,4 @@ def branchWithPokeHoles(region: Region, baseDirection: Direction, startingCoords
         sumBlocks += tempBlocks
         mined += tempmined
 
-    return tuple((sumBlocks, mined))
+    return tuple[sumBlocks, mined]
