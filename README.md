@@ -36,3 +36,16 @@ where r.x.z.mca is one of the region files and strategy is either basic or poke.
 cargo run n
 ```
 where n is the number of threads you would like to allocate.
+
+## What still needs to be done:
+- The individual mining functions should return the nunmber of blocks mined rather than having the number hardcoded or semi hard coded in.
+- Mining functions and strategies should be verified for correctness.
+- Ore expansion should increase the blocks mined rather than it being a constant.
+- Documentation still needs to be finished for both python and rust files.
+- Get Nick's R files and include them.
+- [results.py](results.py) should be broken into functions for eaier reading and reusability.
+- Results should also generate stacked bar graphs to compare the different mining strategies directly.
+- Results should be changed to be a ratio of the block in question compared to the number of blocks mined/exposed.
+- This file needs to be updated to explain the contents of the repo better.
+- Create an explanation and comparison for results.
+- There should be comparisons within the mining techniques to see what parameters lead to the most efficient mining strategy.
