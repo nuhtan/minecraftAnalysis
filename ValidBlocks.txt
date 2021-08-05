@@ -1,0 +1,16 @@
+iron_ore:iron
+deepslate_iron_ore:iron
+gold_ore:gold
+deepslate_gold_ore:gold
+diamond_ore:diamonds
+deepslate_diamond_ore:diamonds
+copper_ore:copper
+deepslate_copper_ore:copper
+redstone_ore:redstone
+deepslate_redstone_ore:redstone
+lapis_ore:lapis
+deepslate_lapis_ore:lapis
+coal_ore:coal
+deepslate_coal_ore:coal
+emerald_ore:emeralds
+deepslate_emerald_ore:emeralds
