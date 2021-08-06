@@ -66,9 +66,9 @@ pub fn iterable_ore_expansion(
     let loop_reg = region.clone();
     deq.push_back(SimpleBlock::new(coords, get_block(region, coords)));
     let mut expanded = Vec::new();
+    let mut current = 1;
 
     while deq.len() > 0 {
-        let mut deq = deq.clone();
         let reg = loop_reg.clone();
         let block = deq.pop_front().unwrap();
         let cen_block = block.clone();
@@ -80,7 +80,7 @@ pub fn iterable_ore_expansion(
                         let new_coords = (cen_block.x + x, cen_block.y + y, cen_block.z + z);
                         let adj_reg = reg.clone();
                         let adj = SimpleBlock::new(new_coords, get_block(adj_reg, new_coords));
-                        if valid.contains_key(&cen_block.block) {
+                        if valid.contains_key(&adj.block) {
                             let mut found = false;
                             let exp = expanded.clone();
                             for b in exp {
@@ -101,6 +101,7 @@ pub fn iterable_ore_expansion(
                 }
             }
         }
+        current += 1;
     }
 
     return expanded;
