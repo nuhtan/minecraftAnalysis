@@ -17,7 +17,13 @@ fn main() {
     // } else {
     //     println!("{}", args.len());
     // }
-    simulate_range(String::from("r.0.0.mca"), Technique::Branch, 30, 20);
+    // let region = Region::from_file(String::from("regions/r.0.0.mca"));
+    // mining::get_block(region, (272, 22, 255));
+    simulate_range(String::from("r.0.0.mca"), Technique::Branch, 21, 20);
+    // let n: i64 = -6187345408056745440;
+    // let num = n as u64;
+    // let hmm = n + i64::MAX;
+    // println!("{} - {} - {}", n, num, hmm);
 }
 
 fn simulate_range(region_file_name: String, technique: Technique, max: i32, min: i32) {
@@ -58,6 +64,7 @@ fn simulate_range(region_file_name: String, technique: Technique, max: i32, min:
         ])
         .unwrap();
     for y in min..max {
+        println!("Starting y: {}", y);
         let file_name = f_name.clone();
         let tech = t.clone();
         let results = simulate(file_name, tech, y);
@@ -83,6 +90,7 @@ fn simulate_range(region_file_name: String, technique: Technique, max: i32, min:
 fn simulate(region_file_name: String, technique: Technique, y: i32) -> HashMap<String, i32> {
     let region = Region::from_file(format!("regions/{}", region_file_name));
     let exp_region = region.clone();
+    println!("Starting sim");
     let sim_results = match technique {
         Technique::Branch => techniques::branch_mining(
             region,
@@ -102,6 +110,9 @@ fn simulate(region_file_name: String, technique: Technique, y: i32) -> HashMap<S
             12,
         ),
     };
+    println!("Finished sim");
+    let start_mined = sim_results.1;
+    println!("Checking {} blocks", sim_results.0.len());
     let mut lava = Vec::new();
     let mut ores = Vec::new();
     let valid = get_valid_blocks();
@@ -114,12 +125,15 @@ fn simulate(region_file_name: String, technique: Technique, y: i32) -> HashMap<S
         }
     }
     let mut expanded_ores = Vec::new();
+    let ores_starting = ores.len();
+    println!("Found {} starting ores", ores.len());
     for ore in ores {
         let region = exp_region.clone();
         let valid = exp_valid.clone();
         let mut expanded = iterable_ore_expansion(region, valid, ore.get_coords());
         expanded_ores.append(&mut expanded);
     }
+    println!("Starting trimming");
     let mut trimmed = Vec::new();
     for ore in expanded_ores {
         let mut found = false;
@@ -134,15 +148,33 @@ fn simulate(region_file_name: String, technique: Technique, y: i32) -> HashMap<S
     }
 
     let mut results = HashMap::new();
+    results.insert(String::from("iron"), 0);
+    results.insert(String::from("gold"), 0);
+    results.insert(String::from("diamonds"), 0);
+    results.insert(String::from("copper"), 0);
+    results.insert(String::from("redstone"), 0);
+    results.insert(String::from("lapis"), 0);
+    results.insert(String::from("coal"), 0);
+    results.insert(String::from("emeralds"), 0);
+    let ores_ending = trimmed.len();
 
-    for ore in trimmed {
-        if results.contains_key(&ore.block) {
-            *results.get_mut(&ore.block).unwrap() += 1;
+    for mut ore in trimmed {
+        println!("Insert {}", ore.block);
+        if results.contains_key(valid.get(&mut ore.block).unwrap()) {
+            let key = valid.get(&mut ore.block).unwrap();
+            if let Some(c) = results.get_mut(key) {
+                *c += 1
+            }
         } else {
-            results.insert(ore.block, 1);
+            let temp = valid.get(&mut ore.block).unwrap();
+            let test = temp.clone();
+            results.insert(test, 1);
         }
     }
 
+    results.insert(String::from("blocks mined"), start_mined as i32 + (ores_ending - ores_starting) as i32);
+    results.insert(String::from("blocks exposed"), sim_results.2 as i32);
+    results.insert(String::from("lava"), lava.len() as i32);
     return results;
 }
 
@@ -153,7 +185,7 @@ fn get_valid_blocks() -> HashMap<String, String> {
         let parts: Vec<&str> = line.split(":").collect();
         let input = String::from(parts[0]);
         let output = String::from(parts[1]);
-        map.insert(input, output).unwrap();
+        map.insert(input, output);
     }
     return map;
 }
