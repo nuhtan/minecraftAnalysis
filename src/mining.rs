@@ -66,7 +66,6 @@ pub fn iterable_ore_expansion(
     let loop_reg = region.clone();
     deq.push_back(SimpleBlock::new(coords, get_block(region, coords)));
     let mut expanded = Vec::new();
-    let mut current = 1;
 
     while deq.len() > 0 {
         let reg = loop_reg.clone();
@@ -101,7 +100,6 @@ pub fn iterable_ore_expansion(
                 }
             }
         }
-        current += 1;
     }
 
     return expanded;
@@ -114,7 +112,11 @@ pub fn get_block(region: Region, coords: (i32, i32, i32)) -> String {
     return chunk.get_block(coords.0 % 16, coords.1, coords.2 % 16).id;
 }
 
-fn twoByOneSingle(region: Region, direction: Direction, coords: (i32, i32, i32)) -> (Vec<SimpleBlock>, u32, u32) {
+fn two_by_one_single(
+    region: Region,
+    direction: Direction,
+    coords: (i32, i32, i32),
+) -> (Vec<SimpleBlock>, u32, u32) {
     let mut blocks = Vec::new();
     let mut x_range = 0..1;
     let mut z_range = 0..1;
@@ -133,18 +135,29 @@ fn twoByOneSingle(region: Region, direction: Direction, coords: (i32, i32, i32))
         }
     }
     let y_clone = region.clone();
-    blocks.push(SimpleBlock::new((coords.0, coords.1 - 1, coords.2), get_block(region, (coords.0, coords.1 - 1, coords.2))));
-    blocks.push(SimpleBlock::new((coords.0, coords.1 + 2, coords.2), get_block(y_clone, (coords.0, coords.1 + 2, coords.2))));
+    blocks.push(SimpleBlock::new(
+        (coords.0, coords.1 - 1, coords.2),
+        get_block(region, (coords.0, coords.1 - 1, coords.2)),
+    ));
+    blocks.push(SimpleBlock::new(
+        (coords.0, coords.1 + 2, coords.2),
+        get_block(y_clone, (coords.0, coords.1 + 2, coords.2)),
+    ));
     return (blocks, 2, 8);
 }
 
-pub fn twoByOneLength(region: Region, direction: Direction, coords: (i32, i32, i32), length: i32) -> (Vec<SimpleBlock>, u32, u32) {
+pub fn two_by_one_length(
+    region: Region,
+    direction: Direction,
+    coords: (i32, i32, i32),
+    length: i32,
+) -> (Vec<SimpleBlock>, u32, u32) {
     let mut results = (Vec::new(), 0, 0);
     for n in 0..length {
         let region = region.clone();
         let direction = direction.clone();
         let direction_dup = direction.clone();
-        let mut res = twoByOneSingle(region, direction, shift_coords(direction_dup, coords, n));
+        let mut res = two_by_one_single(region, direction, shift_coords(direction_dup, coords, n));
         results.0.append(&mut res.0);
         results.1 += res.1;
         results.2 += res.2;
@@ -152,31 +165,63 @@ pub fn twoByOneLength(region: Region, direction: Direction, coords: (i32, i32, i
     return results;
 }
 
-pub fn twoByOneEnd(region: Region, direction: Direction, coords: (i32, i32, i32)) -> (Vec<SimpleBlock>, u32, u32) {
+pub fn two_by_one_end(
+    region: Region,
+    direction: Direction,
+    coords: (i32, i32, i32),
+) -> (Vec<SimpleBlock>, u32, u32) {
     let mut results = (Vec::new(), 0, 2);
     let region_copy = region.clone();
     match direction {
         Direction::North => {
-            results.0.push(SimpleBlock::new((coords.0, coords.1, coords.2 - 1), get_block(region, (coords.0, coords.1, coords.2 - 1))));
-            results.0.push(SimpleBlock::new((coords.0, coords.1 + 1, coords.2 - 1), get_block(region_copy, (coords.0, coords.1 + 1, coords.2 - 1))));
-        },
+            results.0.push(SimpleBlock::new(
+                (coords.0, coords.1, coords.2 - 1),
+                get_block(region, (coords.0, coords.1, coords.2 - 1)),
+            ));
+            results.0.push(SimpleBlock::new(
+                (coords.0, coords.1 + 1, coords.2 - 1),
+                get_block(region_copy, (coords.0, coords.1 + 1, coords.2 - 1)),
+            ));
+        }
         Direction::South => {
-            results.0.push(SimpleBlock::new((coords.0, coords.1, coords.2 + 1), get_block(region, (coords.0, coords.1, coords.2 + 1))));
-            results.0.push(SimpleBlock::new((coords.0, coords.1 + 1, coords.2 + 1), get_block(region_copy, (coords.0, coords.1 + 1, coords.2 + 1))));
-        },
+            results.0.push(SimpleBlock::new(
+                (coords.0, coords.1, coords.2 + 1),
+                get_block(region, (coords.0, coords.1, coords.2 + 1)),
+            ));
+            results.0.push(SimpleBlock::new(
+                (coords.0, coords.1 + 1, coords.2 + 1),
+                get_block(region_copy, (coords.0, coords.1 + 1, coords.2 + 1)),
+            ));
+        }
         Direction::East => {
-            results.0.push(SimpleBlock::new((coords.0 + 1, coords.1, coords.2), get_block(region, (coords.0 + 1, coords.1, coords.2))));
-            results.0.push(SimpleBlock::new((coords.0 + 1, coords.1 + 1, coords.2), get_block(region_copy, (coords.0 + 1, coords.1 + 1, coords.2))));
-        },
+            results.0.push(SimpleBlock::new(
+                (coords.0 + 1, coords.1, coords.2),
+                get_block(region, (coords.0 + 1, coords.1, coords.2)),
+            ));
+            results.0.push(SimpleBlock::new(
+                (coords.0 + 1, coords.1 + 1, coords.2),
+                get_block(region_copy, (coords.0 + 1, coords.1 + 1, coords.2)),
+            ));
+        }
         Direction::West => {
-            results.0.push(SimpleBlock::new((coords.0 - 1, coords.1, coords.2), get_block(region, (coords.0 - 1, coords.1, coords.2))));
-            results.0.push(SimpleBlock::new((coords.0 - 1, coords.1 + 1, coords.2), get_block(region_copy, (coords.0 - 1, coords.1 + 1, coords.2))));
-        },
+            results.0.push(SimpleBlock::new(
+                (coords.0 - 1, coords.1, coords.2),
+                get_block(region, (coords.0 - 1, coords.1, coords.2)),
+            ));
+            results.0.push(SimpleBlock::new(
+                (coords.0 - 1, coords.1 + 1, coords.2),
+                get_block(region_copy, (coords.0 - 1, coords.1 + 1, coords.2)),
+            ));
+        }
     }
     return results;
 }
 
-fn oneByOneSingle(region: Region, direction: Direction, coords: (i32, i32, i32)) -> (Vec<SimpleBlock>, u32, u32) {
+fn one_by_one_single(
+    region: Region,
+    direction: Direction,
+    coords: (i32, i32, i32),
+) -> (Vec<SimpleBlock>, u32, u32) {
     let mut blocks = Vec::new();
     let mut x_range = 0..1;
     let mut z_range = 0..1;
@@ -195,18 +240,29 @@ fn oneByOneSingle(region: Region, direction: Direction, coords: (i32, i32, i32))
         }
     }
     let y_clone = region.clone();
-    blocks.push(SimpleBlock::new((coords.0, coords.1 - 1, coords.2), get_block(region, (coords.0, coords.1 - 1, coords.2))));
-    blocks.push(SimpleBlock::new((coords.0, coords.1 + 1, coords.2), get_block(y_clone, (coords.0, coords.1 + 2, coords.2))));
+    blocks.push(SimpleBlock::new(
+        (coords.0, coords.1 - 1, coords.2),
+        get_block(region, (coords.0, coords.1 - 1, coords.2)),
+    ));
+    blocks.push(SimpleBlock::new(
+        (coords.0, coords.1 + 1, coords.2),
+        get_block(y_clone, (coords.0, coords.1 + 2, coords.2)),
+    ));
     return (blocks, 1, 5);
 }
 
-fn oneByOneLength(region: Region, direction: Direction, coords: (i32, i32, i32), length: i32) -> (Vec<SimpleBlock>, u32, u32) {
+fn one_by_one_length(
+    region: Region,
+    direction: Direction,
+    coords: (i32, i32, i32),
+    length: i32,
+) -> (Vec<SimpleBlock>, u32, u32) {
     let mut results = (Vec::new(), 0, 0);
     for n in 0..length {
         let region = region.clone();
         let direction = direction.clone();
         let direction_dup = direction.clone();
-        let mut res = oneByOneSingle(region, direction, shift_coords(direction_dup, coords, n));
+        let mut res = one_by_one_single(region, direction, shift_coords(direction_dup, coords, n));
         results.0.append(&mut res.0);
         results.1 += res.1;
         results.2 += res.2;
@@ -214,32 +270,56 @@ fn oneByOneLength(region: Region, direction: Direction, coords: (i32, i32, i32),
     return results;
 }
 
-fn oneByOneEnd(region: Region, direction: Direction, coords: (i32, i32, i32)) -> (Vec<SimpleBlock>, u32, u32) {
+fn one_by_one_end(
+    region: Region,
+    direction: Direction,
+    coords: (i32, i32, i32),
+) -> (Vec<SimpleBlock>, u32, u32) {
     let mut results = (Vec::new(), 0, 1);
     match direction {
         Direction::North => {
-            results.0.push(SimpleBlock::new((coords.0, coords.1, coords.2 - 1), get_block(region, (coords.0, coords.1, coords.2 - 1))));
-        },
+            results.0.push(SimpleBlock::new(
+                (coords.0, coords.1, coords.2 - 1),
+                get_block(region, (coords.0, coords.1, coords.2 - 1)),
+            ));
+        }
         Direction::South => {
-            results.0.push(SimpleBlock::new((coords.0, coords.1, coords.2 + 1), get_block(region, (coords.0, coords.1, coords.2 + 1))));
-        },
+            results.0.push(SimpleBlock::new(
+                (coords.0, coords.1, coords.2 + 1),
+                get_block(region, (coords.0, coords.1, coords.2 + 1)),
+            ));
+        }
         Direction::East => {
-            results.0.push(SimpleBlock::new((coords.0 + 1, coords.1, coords.2), get_block(region, (coords.0 + 1, coords.1, coords.2))));
-        },
+            results.0.push(SimpleBlock::new(
+                (coords.0 + 1, coords.1, coords.2),
+                get_block(region, (coords.0 + 1, coords.1, coords.2)),
+            ));
+        }
         Direction::West => {
-            results.0.push(SimpleBlock::new((coords.0 - 1, coords.1, coords.2), get_block(region, (coords.0 - 1, coords.1, coords.2))));
-        },
+            results.0.push(SimpleBlock::new(
+                (coords.0 - 1, coords.1, coords.2),
+                get_block(region, (coords.0 - 1, coords.1, coords.2)),
+            ));
+        }
     }
     return results;
 }
 
-fn pokeStart(region: Region, coords: (i32, i32, i32)) -> (Vec<SimpleBlock>, u32, u32) {
+fn poke_start(region: Region, coords: (i32, i32, i32)) -> (Vec<SimpleBlock>, u32, u32) {
     let mut results = (Vec::new(), 0, 1);
-    results.0.push(SimpleBlock::new((coords.0, coords.1 + 1, coords.2), get_block(region, (coords.0, coords.1 + 1, coords.2))));
+    results.0.push(SimpleBlock::new(
+        (coords.0, coords.1 + 1, coords.2),
+        get_block(region, (coords.0, coords.1 + 1, coords.2)),
+    ));
     return results;
 }
 
-fn poke(region: Region, direction: Direction, coords: (i32, i32, i32), depth: i32) -> (Vec<SimpleBlock>, u32, u32) {
+pub fn poke(
+    region: Region,
+    direction: Direction,
+    coords: (i32, i32, i32),
+    depth: i32,
+) -> (Vec<SimpleBlock>, u32, u32) {
     if depth < 1 {
         panic!("Poke should be at least 1 block in depth")
     }
@@ -249,15 +329,24 @@ fn poke(region: Region, direction: Direction, coords: (i32, i32, i32), depth: i3
     let end_direction = direction.clone();
     let end_direction2 = direction.clone();
     let mut results = (Vec::new(), 0, 0);
-    let mut res = pokeStart(region, coords);
+    let mut res = poke_start(region, coords);
     results.0.append(&mut res.0);
     results.1 += res.1;
     results.2 += res.2;
-    let mut res = oneByOneLength(length_region, direction, shift_coords(length_direction2, coords, 1), depth - 1);
+    let mut res = one_by_one_length(
+        length_region,
+        direction,
+        shift_coords(length_direction2, coords, 1),
+        depth - 1,
+    );
     results.0.append(&mut res.0);
     results.1 += res.1;
     results.2 += res.2;
-    let mut res = oneByOneEnd(end_region, end_direction, shift_coords(end_direction2, coords, depth - 1));
+    let mut res = one_by_one_end(
+        end_region,
+        end_direction,
+        shift_coords(end_direction2, coords, depth - 1),
+    );
     results.0.append(&mut res.0);
     results.1 += res.1;
     results.2 += res.2;
