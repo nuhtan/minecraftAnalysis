@@ -1,5 +1,5 @@
 [package]
-name = "minecraftMining"
+name = "minecraft_analysis"
 version = "0.1.0"
 authors = ["nuhtan <ncrichardson15@gmail.com>"]
 edition = "2018"
