@@ -1,32 +1,218 @@
 mod mining;
 mod techniques;
 
-use mvp_anvil::region::Region;
+use mining::{get_block, iterable_ore_expansion};
 use techniques::Technique;
 
-use std::{collections::hash_map::HashMap, env, fs::{self, File}, io::{BufRead, BufReader}};
+use mvp_anvil::region::Region;
+use threadpool::ThreadPool;
 
-use crate::mining::iterable_ore_expansion;
+use std::{
+    collections::hash_map::HashMap,
+    env,
+    fs::{self, File},
+    io::{BufRead, BufReader},
+};
 
 fn main() {
-    // let args = env::args();
-    // if args.len() > 4 {
-    //     println!("Please make sure that you provide proper arguments.")
-    // } else if args.len() == 1 {
-    //     println!("Help should be here...");
-    // } else {
-    //     println!("{}", args.len());
-    // }
-    // let region = Region::from_file(String::from("regions/r.0.0.mca"));
-    // mining::get_block(region, (272, 22, 255));
-    simulate_range(String::from("r.0.0.mca"), Technique::Branch, 21, 20);
-    // let n: i64 = -6187345408056745440;
-    // let num = n as u64;
-    // let hmm = n + i64::MAX;
-    // println!("{} - {} - {}", n, num, hmm);
+    let args: Vec<String> = env::args().collect();
+    if args.len() == 1 {
+        todo!("Functionality for the interactive menu is not yet implemented...");
+    } else if args.len() < 2 {
+        display_help();
+    } else {
+        let first = args[1].clone();
+        match first.as_str() {
+            "single" => {
+                if args.len() != 5 && args.len() != 6 {
+                    single_help();
+                } else {
+                    let file = args[2].clone();
+                    let technique = match args[3].as_str() {
+                        "branch" => Technique::Branch,
+                        "poke" => Technique::BranchWithPoke,
+                        _ => panic!("Invalid technique, should be 'branch' or 'poke'."),
+                    };
+                    let y = args[4].parse().unwrap();
+                    let verbosity = if args.len() == 6 {
+                        match args[5].as_str() {
+                            "high" => Verbosity::High,
+                            "low" => Verbosity::Low,
+                            _ => panic!(
+                                "Invalid verbosity, should be 'high', 'low', or not included."
+                            ),
+                        }
+                    } else {
+                        Verbosity::None
+                    };
+                    simulate(file, technique, y, verbosity);
+                }
+            }
+            // range file technique min max verbosity
+            "range" => {
+                if args.len() != 6 && args.len() != 7 {
+                    range_help();
+                } else {
+                    let file = args[2].clone();
+                    let technique = match args[3].as_str() {
+                        "branch" => Technique::Branch,
+                        "poke" => Technique::BranchWithPoke,
+                        _ => panic!("Invalid technique, should be 'branch' or 'poke'."),
+                    };
+                    let min = args[4].parse().unwrap();
+                    let max = args[5].parse().unwrap();
+                    let verbosity = if args.len() == 7 {
+                        match args[6].as_str() {
+                            "high" => Verbosity::High,
+                            "low" => Verbosity::Low,
+                            _ => panic!(
+                                "Invalid verbosity, should be 'high', 'low', or not included."
+                            ),
+                        }
+                    } else {
+                        Verbosity::None
+                    };
+                    simulate_range(file, technique, max, min, verbosity);
+                }
+            }
+            // full threads min max verbosity
+            "full" => {
+                if args.len() != 5 && args.len() != 6 {
+                    full_help();
+                } else {
+                    let threads = args[2].parse().unwrap();
+                    let min = args[3].parse().unwrap();
+                    let max = args[4].parse().unwrap();
+                    let verbosity = if args.len() == 6 {
+                        match args[5].as_str() {
+                            "high" => Verbosity::High,
+                            "low" => Verbosity::Low,
+                            _ => panic!(
+                                "Invalid verbosity, should be 'high', 'low', or not included."
+                            ),
+                        }
+                    } else {
+                        Verbosity::None
+                    };
+                    let pool = ThreadPool::new(threads);
+                    for file in fs::read_dir("regions").unwrap() {
+                        let verbosity = verbosity.clone();
+                        let file = file.unwrap();
+                        if file.file_name().to_str().unwrap().contains(".mca") {
+                            pool.execute(move || {
+                                for technique in &[Technique::Branch, Technique::BranchWithPoke] {
+                                    simulate_range(
+                                        file.file_name().to_str().unwrap().to_string(),
+                                        technique.clone(),
+                                        max,
+                                        min,
+                                        verbosity.clone(),
+                                    );
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            // chunk threads mix max verbosity
+            "chunk" => {
+                if args.len() != 5 && args.len() != 6 {
+                    chunk_help();
+                } else {
+                    let threads = args[2].parse().unwrap();
+                    let min = args[3].parse().unwrap();
+                    let max = args[4].parse().unwrap();
+                    let verbosity = if args.len() == 6 {
+                        match args[5].as_str() {
+                            "high" => Verbosity::High,
+                            "low" => Verbosity::Low,
+                            _ => panic!(
+                                "Invalid verbosity, should be 'high', 'low', or not included."
+                            ),
+                        }
+                    } else {
+                        Verbosity::None
+                    };
+                    let pool = ThreadPool::new(threads);
+                    for file in fs::read_dir("regions").unwrap() {
+                        let verbosity = verbosity.clone();
+                        let file = file.unwrap();
+                        if file.file_name().to_str().unwrap().contains(".mca") {
+                            pool.execute(move || {
+                                chunk_analysis(
+                                    file.file_name().to_str().unwrap().to_string(),
+                                    max,
+                                    min,
+                                    verbosity,
+                                );
+                            });
+                        }
+                    }
+                }
+            }
+            "help" => {
+                display_help();
+            }
+            _ => {
+                display_help();
+            }
+        }
+    }
 }
 
-fn simulate_range(region_file_name: String, technique: Technique, max: i32, min: i32) {
+fn single_help() {
+    println!("Single Simulation:");
+    println!("./minecraft_analysis single file technique y verbosity");
+    println!("Where 'file' is the name of the regions file, 'technique' is either 'branch' or 'poke', where 'y' is the y level that the simulation should take place at.");
+    println!("'verbosity' is an optional parameter that is not required. Valid inputs are 'low' and 'high'.");
+    println!("");
+}
+
+fn range_help() {
+    println!("Simulation over a Range:");
+    println!("./minecraft_analysis range file technique min max verbosity");
+    println!("Where 'file' is the name of the regions file, 'technique' is either 'branch' or 'poke', where 'min' is the y level for the first simulation, and 'max' is the final y level that should be simulated.");
+    println!("'verbosity' is an optional parameter that is not required. Valid inputs are 'low' and 'high'.");
+    println!("");
+}
+
+fn full_help() {
+    println!("Full Simulation:");
+    println!("./minecraft_analysis full threads min max verbosity");
+    println!("Where 'threads' is the number of threads allocated to the simulation, 'min' is the minimum y value that should be simulated, and 'max' is the maximum y level that should be simulated.");
+    println!("'verbosity' is an optional parameter that is not required. Valid inputs are 'low' and 'high'.");
+    println!("");
+}
+
+fn chunk_help() {
+    println!("Chunk Data:");
+    println!("./minecraft_analysis chunk threads min max verbosity");
+    println!("Where 'threads' is the number of threads allocated to the simulation, 'min' is the minimum y value that should be simulated, and 'max' is the maximum y level that should be simulated.");
+    println!("'verbosity' is an optional parameter that is not required. Valid inputs are 'low' and 'high'.");
+    println!("");
+}
+
+fn display_help() {
+    single_help();
+    range_help();
+    full_help();
+    chunk_help();
+}
+
+#[derive(Clone)]
+enum Verbosity {
+    Low,
+    High,
+    None,
+}
+
+fn simulate_range(
+    region_file_name: String,
+    technique: Technique,
+    max: i32,
+    min: i32,
+    verbosity: Verbosity,
+) {
     let f_name = region_file_name.clone();
     let t = technique.clone();
     let t1 = technique.clone();
@@ -35,12 +221,14 @@ fn simulate_range(region_file_name: String, technique: Technique, max: i32, min:
         "mining_data/result-{}-{}.csv",
         region_file_name,
         t1.name()
-    )).ok();
+    ))
+    .ok();
     File::create(format!(
         "mining_data/result-{}-{}.csv",
         region_file_name,
         t2.name()
-    )).unwrap();
+    ))
+    .unwrap();
     let mut csv_writer = csv::Writer::from_path(format!(
         "mining_data/result-{}-{}.csv",
         region_file_name,
@@ -64,10 +252,11 @@ fn simulate_range(region_file_name: String, technique: Technique, max: i32, min:
         ])
         .unwrap();
     for y in min..max {
+        let verbosity = verbosity.clone();
         println!("Starting y: {}", y);
         let file_name = f_name.clone();
         let tech = t.clone();
-        let results = simulate(file_name, tech, y);
+        let results = simulate(file_name, tech, y, verbosity);
         csv_writer
             .write_record(&[
                 y.to_string(),
@@ -87,19 +276,18 @@ fn simulate_range(region_file_name: String, technique: Technique, max: i32, min:
     }
 }
 
-fn simulate(region_file_name: String, technique: Technique, y: i32) -> HashMap<String, i32> {
+fn simulate(
+    region_file_name: String,
+    technique: Technique,
+    y: i32,
+    verbosity: Verbosity,
+) -> HashMap<String, i32> {
     let region = Region::from_file(format!("regions/{}", region_file_name));
     let exp_region = region.clone();
-    println!("Starting sim");
     let sim_results = match technique {
-        Technique::Branch => techniques::branch_mining(
-            region,
-            mining::Direction::South,
-            (255, y, 255),
-            16,
-            160,
-            5
-        ),
+        Technique::Branch => {
+            techniques::branch_mining(region, mining::Direction::South, (255, y, 255), 16, 160, 5)
+        }
         Technique::BranchWithPoke => techniques::branch_mining_with_poke_holes(
             region,
             mining::Direction::South,
@@ -110,9 +298,7 @@ fn simulate(region_file_name: String, technique: Technique, y: i32) -> HashMap<S
             12,
         ),
     };
-    println!("Finished sim");
     let start_mined = sim_results.1;
-    println!("Checking {} blocks", sim_results.0.len());
     let mut lava = Vec::new();
     let mut ores = Vec::new();
     let valid = get_valid_blocks();
@@ -126,14 +312,12 @@ fn simulate(region_file_name: String, technique: Technique, y: i32) -> HashMap<S
     }
     let mut expanded_ores = Vec::new();
     let ores_starting = ores.len();
-    println!("Found {} starting ores", ores.len());
     for ore in ores {
         let region = exp_region.clone();
         let valid = exp_valid.clone();
         let mut expanded = iterable_ore_expansion(region, valid, ore.get_coords());
         expanded_ores.append(&mut expanded);
     }
-    println!("Starting trimming");
     let mut trimmed = Vec::new();
     for ore in expanded_ores {
         let mut found = false;
@@ -159,7 +343,6 @@ fn simulate(region_file_name: String, technique: Technique, y: i32) -> HashMap<S
     let ores_ending = trimmed.len();
 
     for mut ore in trimmed {
-        println!("Insert {}", ore.block);
         if results.contains_key(valid.get(&mut ore.block).unwrap()) {
             let key = valid.get(&mut ore.block).unwrap();
             if let Some(c) = results.get_mut(key) {
@@ -172,11 +355,16 @@ fn simulate(region_file_name: String, technique: Technique, y: i32) -> HashMap<S
         }
     }
 
-    results.insert(String::from("blocks mined"), start_mined as i32 + (ores_ending - ores_starting) as i32);
+    results.insert(
+        String::from("blocks mined"),
+        start_mined as i32 + (ores_ending - ores_starting) as i32,
+    );
     results.insert(String::from("blocks exposed"), sim_results.2 as i32);
     results.insert(String::from("lava"), lava.len() as i32);
     return results;
 }
+
+fn chunk_analysis(region_file_name: String, max: i32, min: i32, verbosity: Verbosity) {}
 
 fn get_valid_blocks() -> HashMap<String, String> {
     let mut map = HashMap::new();
