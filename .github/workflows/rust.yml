@@ -1,4 +1,4 @@
-name: Build Linux
+name: Build
 
 on:
   push:
@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,3 +22,16 @@ jobs:
       with:
         name: linux-executable
         path: target/release/minecraft_analysis
+  
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build Release
+      run: cargo build --verbose --release
+    - name: Upload windows executable
+      uses: actions/upload-artifact@v1
+      with:
+        name: linux-executable
+        path: target/release/minecraft_analysis.exe
