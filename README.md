@@ -21,7 +21,7 @@ git clone https://github.com/nuhtan/minecraftAnalysis.git
 cargo build --release
 ```
 ```
-./target/release/minecraft_analysis
+./target/release/minecraft_analysis help
 ```
 
 ## What still needs to be done:
