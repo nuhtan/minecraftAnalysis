@@ -33,7 +33,6 @@ cargo build --release
 - Create an explanation and comparison for results.
 - There should be comparisons within the mining techniques to see what parameters lead to the most efficient mining strategy.
 - Test cases and benchmarks.
-- Ore expansion does not currently add to the number of blocks exposed.
 - CLI walk through as an alternative to inputting cli arguments.
 - Project directories should be created if they don't already exist.
 - Python files should be moved to a separate repository as they no longer serve as a reference due to bugs and inaccuracies.
