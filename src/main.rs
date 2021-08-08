@@ -112,6 +112,7 @@ fn main() {
                             });
                         }
                     }
+                    pool.join();
                 }
             }
             // chunk threads mix max verbosity
