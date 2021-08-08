@@ -61,11 +61,12 @@ pub fn iterable_ore_expansion(
     region: Region,
     valid: HashMap<String, String>,
     coords: (i32, i32, i32),
-) -> Vec<SimpleBlock> {
+) -> (Vec<SimpleBlock>, Vec<SimpleBlock>) {
     let mut deq = VecDeque::new();
     let loop_reg = region.clone();
     deq.push_back(SimpleBlock::new(coords, get_block(region, coords)));
     let mut expanded = Vec::new();
+    let mut exposed = Vec::new();
 
     while deq.len() > 0 {
         let reg = loop_reg.clone();
@@ -75,10 +76,13 @@ pub fn iterable_ore_expansion(
         for x in -1..2 {
             for y in -1..2 {
                 for z in -1..2 {
+                    let adj_reg = reg.clone();
+                    let adj_reg2 = reg.clone();
+                    let new_coords = (cen_block.x + x, cen_block.y + y, cen_block.z + z);
+                    let exp = SimpleBlock::new(new_coords, get_block(adj_reg, new_coords));
+                    exposed.push(exp);
                     if !(x == 0 && y == 0 && z == 0) {
-                        let new_coords = (cen_block.x + x, cen_block.y + y, cen_block.z + z);
-                        let adj_reg = reg.clone();
-                        let adj = SimpleBlock::new(new_coords, get_block(adj_reg, new_coords));
+                        let adj = SimpleBlock::new(new_coords, get_block(adj_reg2, new_coords));
                         if valid.contains_key(&adj.block) {
                             let mut found = false;
                             let exp = expanded.clone();
@@ -102,7 +106,7 @@ pub fn iterable_ore_expansion(
         }
     }
 
-    return expanded;
+    return (expanded, exposed);
 }
 
 pub fn get_block(region: Region, coords: (i32, i32, i32)) -> String {

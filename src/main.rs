@@ -291,7 +291,7 @@ fn simulate(
 ) -> HashMap<String, i32> {
     let region = Region::from_file(format!("regions/{}", region_file_name));
     let exp_region = region.clone();
-    let sim_results = match technique {
+    let mut sim_results = match technique {
         Technique::Branch => {
             techniques::branch_mining(region, mining::Direction::South, (255, y, 255), 16, 160, 5)
         }
@@ -323,6 +323,7 @@ fn simulate(
         }
     }
     let mut expanded_ores = Vec::new();
+    let mut more_exposed = Vec::new();
     let ores_starting = ores.len();
     match verbosity {
         Verbosity::High => println!("Ore expansion starting with {} ores.", ores.len()),
@@ -332,8 +333,9 @@ fn simulate(
     for ore in ores {
         let region = exp_region.clone();
         let valid = exp_valid.clone();
-        let mut expanded = iterable_ore_expansion(region, valid, ore.get_coords());
+        let (mut expanded, mut new_exposed) = iterable_ore_expansion(region, valid, ore.get_coords());
         expanded_ores.append(&mut expanded);
+        more_exposed.append(&mut new_exposed);
     }
     let mut trimmed = Vec::new();
     for ore in expanded_ores {
@@ -347,6 +349,19 @@ fn simulate(
             trimmed.push(ore);
         }
     }
+    let mut trimmed_new_exposed = Vec::new();
+    for exposed_new in more_exposed {
+        let mut found = false;
+        for comparison in trimmed_new_exposed.clone() {
+            if exposed_new == comparison {
+                found = true;
+            }
+        }
+        if !found {
+            trimmed_new_exposed.push(exposed_new);
+        }
+    }
+    sim_results.2 += trimmed_new_exposed.len() as u32;
 
     let mut results = HashMap::new();
     results.insert(String::from("iron"), 0);
