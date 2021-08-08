@@ -1,7 +1,7 @@
 mod mining;
 mod techniques;
 
-use mining::{get_block, iterable_ore_expansion};
+use mining::iterable_ore_expansion;
 use techniques::Technique;
 
 use mvp_anvil::region::Region;
@@ -217,6 +217,7 @@ fn simulate_range(
     let t = technique.clone();
     let t1 = technique.clone();
     let t2 = technique.clone();
+    let tech_loop = technique.clone();
     fs::remove_file(format!(
         "mining_data/result-{}-{}.csv",
         region_file_name,
@@ -253,6 +254,12 @@ fn simulate_range(
         .unwrap();
     for y in min..max {
         let verbosity = verbosity.clone();
+        let technique = tech_loop.clone();
+        match verbosity {
+            Verbosity::High => println!("Starting y level: {} for file {} with technique: {}", y, region_file_name, technique.name()),
+            Verbosity::Low => println!("Starting y level: {}", y),
+            Verbosity::None => {},
+        }
         println!("Starting y: {}", y);
         let file_name = f_name.clone();
         let tech = t.clone();
@@ -298,6 +305,11 @@ fn simulate(
             12,
         ),
     };
+    match verbosity {
+        Verbosity::High => println!("{} mining sim finished with {} blocks exposed and checked.", technique.name(), sim_results.2),
+        Verbosity::Low => println!("Finished mining sim"),
+        Verbosity::None => {},
+    }
     let start_mined = sim_results.1;
     let mut lava = Vec::new();
     let mut ores = Vec::new();
@@ -312,6 +324,11 @@ fn simulate(
     }
     let mut expanded_ores = Vec::new();
     let ores_starting = ores.len();
+    match verbosity {
+        Verbosity::High => println!("Ore expansion starting with {} ores.", ores.len()),
+        Verbosity::Low => println!("Starting ore expansion"),
+        Verbosity::None => {},
+    }
     for ore in ores {
         let region = exp_region.clone();
         let valid = exp_valid.clone();
