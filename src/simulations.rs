@@ -1,8 +1,17 @@
-use std::{collections::HashMap, fs::{self, File}, io::{BufRead, BufReader}};
+use std::{
+    collections::HashMap,
+    fs::{self, File},
+    io::{BufRead, BufReader},
+    time::Instant,
+};
 
 use mvp_anvil::region::Region;
 
-use crate::{Verbosity, mining::{self, iterable_ore_expansion}, techniques::{self, Technique}};
+use crate::{
+    mining::{self, iterable_ore_expansion},
+    techniques::{self, Technique},
+    Verbosity,
+};
 
 pub fn simulate_range(
     region_file_name: String,
@@ -91,8 +100,7 @@ pub fn simulate(
         Verbosity::None => {}
     }
     let region = Region::from_file(format!("regions/{}", region_file_name));
-    let exp_region = region.clone();
-    let mut sim_results = match technique {
+    let sim_results = match technique {
         Technique::Branch => {
             techniques::branch_mining(region, mining::Direction::South, (255, y, 255), 16, 160, 5)
         }
@@ -115,11 +123,9 @@ pub fn simulate(
         Verbosity::Low => println!("finished mining sim"),
         Verbosity::None => {}
     }
-    let start_mined = sim_results.1;
     let mut lava = Vec::new();
     let mut ores = Vec::new();
     let valid = get_valid_blocks();
-    let exp_valid = valid.clone();
     for block in sim_results.0 {
         if block.block == "lava" || block.block == "flowing_lava" {
             lava.push(block);
@@ -127,52 +133,6 @@ pub fn simulate(
             ores.push(block);
         }
     }
-    let mut expanded_ores = Vec::new();
-    let mut more_exposed = Vec::new();
-    let ores_starting = ores.len();
-    match verbosity {
-        Verbosity::High => println!("ore expansion starting with {} ores.", ores.len()),
-        Verbosity::Low => println!("starting ore expansion"),
-        Verbosity::None => {}
-    }
-    for ore in ores {
-        let region = exp_region.clone();
-        let valid = exp_valid.clone();
-        let (mut expanded, mut new_exposed) =
-            iterable_ore_expansion(region, valid, ore.get_coords());
-        expanded_ores.append(&mut expanded);
-        more_exposed.append(&mut new_exposed);
-    }
-    match verbosity {
-        Verbosity::High => println!("ore expanded to {} ores. Starting trimming on expanded ores and expanded exposed blocks.", expanded_ores.len()),
-        Verbosity::Low => println!("ore expansion finished. Starting trimming."),
-        Verbosity::None => {},
-    }
-    let mut trimmed = Vec::new();
-    for ore in expanded_ores {
-        let mut found = false;
-        for comparison in &trimmed {
-            if ore == *comparison {
-                found = true;
-            }
-        }
-        if !found {
-            trimmed.push(ore);
-        }
-    }
-    let mut trimmed_new_exposed = Vec::new();
-    for exposed_new in more_exposed {
-        let mut found = false;
-        for comparison in trimmed_new_exposed.clone() {
-            if exposed_new == comparison {
-                found = true;
-            }
-        }
-        if !found {
-            trimmed_new_exposed.push(exposed_new);
-        }
-    }
-    sim_results.2 += trimmed_new_exposed.len() as u32;
 
     let mut results = HashMap::new();
     results.insert(String::from("iron"), 0);
@@ -183,9 +143,8 @@ pub fn simulate(
     results.insert(String::from("lapis"), 0);
     results.insert(String::from("coal"), 0);
     results.insert(String::from("emeralds"), 0);
-    let ores_ending = trimmed.len();
 
-    for mut ore in trimmed {
+    for mut ore in ores {
         if results.contains_key(valid.get(&mut ore.block).unwrap()) {
             let key = valid.get(&mut ore.block).unwrap();
             if let Some(c) = results.get_mut(key) {
@@ -198,10 +157,7 @@ pub fn simulate(
         }
     }
 
-    results.insert(
-        String::from("blocks mined"),
-        start_mined as i32 + (ores_ending - ores_starting) as i32,
-    );
+    results.insert(String::from("blocks mined"), sim_results.1 as i32);
     results.insert(String::from("blocks exposed"), sim_results.2 as i32);
     results.insert(String::from("lava"), lava.len() as i32);
     return results;
