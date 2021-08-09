@@ -35,7 +35,8 @@ pub fn handle() {
                     } else {
                         Verbosity::None
                     };
-                    simulate(file, technique, y, verbosity);
+                    let results = simulate(file, technique, y, verbosity);
+                    println!("{:?}", results);
                 }
             }
             // range file technique min max verbosity
