@@ -2,13 +2,12 @@ use std::{
     collections::HashMap,
     fs::{self, File},
     io::{BufRead, BufReader},
-    time::Instant,
 };
 
 use mvp_anvil::region::Region;
 
 use crate::{
-    mining::{self, iterable_ore_expansion},
+    mining,
     techniques::{self, Technique},
     Verbosity,
 };
