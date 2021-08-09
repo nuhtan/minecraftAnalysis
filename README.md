@@ -27,7 +27,7 @@ cargo build --release
 ## What still needs to be done:
 - Documentation still needs to be finished for rust files.
 - Get Nick's R files and include them.
-- [results.py](results.py) should be broken into functions for eaier reading and reusability.
+- [results.py](results.py) should be broken into functions for easier reading and reusability.
 - Results should also generate stacked bar graphs to compare the different mining strategies directly.
 - Results should be changed to be a ratio of the block in question compared to the number of blocks mined/exposed.
 - Create an explanation and comparison for results.
@@ -36,3 +36,4 @@ cargo build --release
 - CLI walk through as an alternative to inputting cli arguments.
 - Project directories should be created if they don't already exist.
 - Python files should be moved to a separate repository as they no longer serve as a reference due to bugs and inaccuracies.
+- Ore expansion should be added as an optional parameter.
