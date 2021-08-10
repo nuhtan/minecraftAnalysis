@@ -1,8 +1,4 @@
-use std::{
-    collections::HashMap,
-    fs::{self, File},
-    io::{BufRead, BufReader},
-};
+use std::{collections::HashMap, fs::{self, File}, io::{BufRead, BufReader}, time::Instant};
 
 use mvp_anvil::region::Region;
 
@@ -87,6 +83,8 @@ pub fn simulate(
     y: i32,
     verbosity: Verbosity,
 ) -> HashMap<String, i32> {
+    let timer = Instant::now();
+    let technique_timer = technique.clone();
     let technique_v = technique.clone();
     match verbosity {
         Verbosity::High => println!(
@@ -159,6 +157,9 @@ pub fn simulate(
     results.insert(String::from("blocks mined"), sim_results.1 as i32);
     results.insert(String::from("blocks exposed"), sim_results.2 as i32);
     results.insert(String::from("lava"), lava.len() as i32);
+    if verbosity == Verbosity::High {
+        println!("{} simulation on file: {} at y: {} took {} seconds.", technique_timer.name(), region_file_name, y, timer.elapsed().as_secs());
+    }
     return results;
 }
 
