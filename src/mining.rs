@@ -109,6 +109,10 @@ pub fn iterable_ore_expansion(
     return (expanded, exposed);
 }
 
+/// Takes a region file and coordinates and returns the name of the block at that location. This handles the intermediary step of determining the x and z [chunks](`mvp_anvil::chunk::Chunk`) that correspond with the coordinates.
+///
+/// * `region` - The [region](`mvp_anvil::region::Region`) file that the block will be retrieved from.
+/// * `coords` - The tuple of xyz coordinates of the block.
 pub fn get_block(region: Region, coords: (i32, i32, i32)) -> String {
     let chunk_x = coords.0 / 16;
     let chunk_z = coords.2 / 16;
