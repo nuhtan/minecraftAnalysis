@@ -35,5 +35,4 @@ cargo build --release
 - Test cases and benchmarks.
 - CLI walk through as an alternative to inputting cli arguments.
 - Project directories should be created if they don't already exist.
-- Python files should be moved to a separate repository as they no longer serve as a reference due to bugs and inaccuracies.
 - Ore expansion should be added as an optional parameter.
