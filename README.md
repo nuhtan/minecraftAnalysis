@@ -2,8 +2,6 @@
 
 ## Contents Explanation:
 - [mining_data](mining_data/) Contains csv files with the results from the mining simulations.
-- [python](python/) Contains the now depreciated code that was the basis for the rust implementation. There are errors and inconsistencies that can be found in this code.
-    - The inner contents of this directory reflect the same structure and thought process as [src](src/).
 - [regions](regions/) Contains the region files that data is collected from.
 - [results](results/) Contains graphs and other metrics for analysis.
 - [src](src/) Contains the rust code that is the center of this project.
