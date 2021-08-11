@@ -4,6 +4,17 @@ use threadpool::ThreadPool;
 
 use crate::{Verbosity, simulations::{chunk_analysis, simulate, simulate_range}, techniques::Technique};
 
+/// Determines what the program should do depending on the arguments or lack of arguments passed to the program on launch.
+///
+/// There are six paths that this could take.
+/// 1. Single - This runs a single simulation with a specified mining technique at a specified y level on a specified region file.
+/// 2. Range - This runs a series of simulations with a specified mining technique through an input range of y levels on a specified region file.
+/// 3. Full - This runs all mining techniques through a specified range of y levels through all region files in the 'regions' directory.
+/// 4. Chunk - This runs a data gathering program on all chunks in a region file for all region files in the 'regions' directory.
+/// 5. None - If there are no arguments passed to the program then an interactive menu will be presented to the user to determine which of the above paths to take.
+/// 6. Help - If the user only inputs help as an argument then the help for each path will be printed to the terminal.
+///
+/// Each of the first four paths has an optional argument `verbosity` that represents how verbose output from the program should be. There are three tiers, high, low, and none.
 pub fn handle() {
     let args: Vec<String> = env::args().collect();
     if args.len() == 1 {
