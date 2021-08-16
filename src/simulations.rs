@@ -7,7 +7,6 @@ pub fn simulate_range(
     technique: Technique,
     max: i32,
     min: i32,
-    verbosity: Verbosity,
 ) {
     let f_name = region_file_name.clone();
     let t = technique.clone();
@@ -48,10 +47,9 @@ pub fn simulate_range(
         ])
         .unwrap();
     for y in min..max {
-        let verbosity = verbosity.clone();
         let file_name = f_name.clone();
         let tech = t.clone();
-        let results = simulate(file_name, tech, y, verbosity);
+        let results = simulate(file_name, tech, y);
         csv_writer
             .write_record(&[
                 y.to_string(),
@@ -75,21 +73,10 @@ pub fn simulate(
     region_file_name: String,
     technique: Technique,
     y: i32,
-    verbosity: Verbosity,
 ) -> HashMap<String, i32> {
     let timer = Instant::now();
     let technique_timer = technique.clone();
     let technique_v = technique.clone();
-    match verbosity {
-        Verbosity::High => println!(
-            "starting y level: {} for file {} with technique: {}.",
-            y,
-            region_file_name,
-            technique_v.name()
-        ),
-        Verbosity::Low => println!("starting y level: {}.", y),
-        Verbosity::None => {}
-    }
     let region = Region::from_file(format!("regions/{}", region_file_name));
     let sim_results = match technique {
         Technique::Branch => {
@@ -105,15 +92,6 @@ pub fn simulate(
             12,
         ),
     };
-    match verbosity {
-        Verbosity::High => println!(
-            "{} mining sim finished with {} blocks exposed and checked.",
-            technique.name(),
-            sim_results.2
-        ),
-        Verbosity::Low => println!("finished mining sim"),
-        Verbosity::None => {}
-    }
     let mut lava = Vec::new();
     let mut ores = Vec::new();
     let valid = get_valid_blocks();
@@ -151,13 +129,10 @@ pub fn simulate(
     results.insert(String::from("blocks mined"), sim_results.1 as i32);
     results.insert(String::from("blocks exposed"), sim_results.2 as i32);
     results.insert(String::from("lava"), lava.len() as i32);
-    if verbosity == Verbosity::High {
-        println!("{} simulation on file: {} at y: {} took {} seconds.", technique_timer.name(), region_file_name, y, timer.elapsed().as_secs());
-    }
     return results;
 }
 
-pub fn chunk_analysis(region_file_name: String, max: i32, min: i32, verbosity: Verbosity) {
+pub fn chunk_analysis(region_file_name: String, max: i32, min: i32) {
     unimplemented!("Not yet cuh")
 }
 
