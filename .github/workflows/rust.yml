@@ -21,7 +21,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: mcAnalysis
-        path: target/release/minecraft_analysis
+        path: target/release/mc_analysis
   
   build-windows:
     runs-on: windows-latest
@@ -34,4 +34,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: mcAnalysis.exe
-        path: target/release/minecraft_analysis.exe
+        path: target/release/mc_analysis.exe
