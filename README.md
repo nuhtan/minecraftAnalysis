@@ -32,5 +32,4 @@ cargo build --release
 - There should be comparisons within the mining techniques to see what parameters lead to the most efficient mining strategy.
 - Test cases and benchmarks.
 - CLI walk through as an alternative to inputting cli arguments.
-- Project directories should be created if they don't already exist.
 - Ore expansion should be added as an optional parameter.
