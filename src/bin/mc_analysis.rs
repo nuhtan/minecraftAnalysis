@@ -1,8 +1,19 @@
 use std::{fs, path::Path, process};
 
+use threadpool::ThreadPool;
+
 fn main() {
     if verify_directory_structure() {
-        arguments::handle();
+        let pool = ThreadPool::new(4);
+        for file in fs::read_dir("regions").unwrap() {
+            let file = file.unwrap();
+            if file.file_name().to_str().unwrap().contains(".mca") {
+                pool.execute(move || {
+                    mcsim::simulations::simulate_range(file.file_name().to_str().unwrap().to_string(), mcsim::techniques::Technique::Branch, 30, 25);
+                });
+            }
+        }
+        pool.join();
     }
 }
 
