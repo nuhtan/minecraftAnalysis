@@ -77,16 +77,14 @@ pub fn simulate(
     y: i32,
 ) -> HashMap<String, i32> {
     let timer = Instant::now();
-    let technique_timer = technique.clone();
-    let technique_v = technique.clone();
     let region = Region::from_file(format!("regions/{}", region_file_name));
     let sim_results = match technique {
         Technique::Branch => {
-            branch_mining(region, Direction::South, (255, y, 255), 16, 160, 5)
+            branch_mining(&region, &Direction::South, (255, y, 255), 16, 160, 5)
         }
         Technique::BranchWithPoke => branch_mining_with_poke_holes(
-            region,
-            Direction::South,
+            &region,
+            &Direction::South,
             (255, y, 255),
             10,
             25,
@@ -131,6 +129,7 @@ pub fn simulate(
     results.insert(String::from("blocks mined"), sim_results.1 as i32);
     results.insert(String::from("blocks exposed"), sim_results.2 as i32);
     results.insert(String::from("lava"), lava.len() as i32);
+    println!("Simulation took {} secs", timer.elapsed().as_secs());
     return results;
 }
 
