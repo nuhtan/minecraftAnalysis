@@ -1,5 +1,7 @@
 use mvp_anvil::region::Region;
 
+use crate::mining::*;
+
 #[derive(Clone)]
 pub enum Technique {
     Branch,

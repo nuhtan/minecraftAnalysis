@@ -1,5 +1,7 @@
 use std::{collections::HashMap, fs::{self, File}, io::{BufRead, BufReader}, time::Instant};
 
+use crate::{techniques::*, mining::Direction};
+
 use mvp_anvil::region::Region;
 
 pub fn simulate_range(
@@ -80,11 +82,11 @@ pub fn simulate(
     let region = Region::from_file(format!("regions/{}", region_file_name));
     let sim_results = match technique {
         Technique::Branch => {
-            techniques::branch_mining(region, mining::Direction::South, (255, y, 255), 16, 160, 5)
+            branch_mining(region, Direction::South, (255, y, 255), 16, 160, 5)
         }
-        Technique::BranchWithPoke => techniques::branch_mining_with_poke_holes(
+        Technique::BranchWithPoke => branch_mining_with_poke_holes(
             region,
-            mining::Direction::South,
+            Direction::South,
             (255, y, 255),
             10,
             25,
