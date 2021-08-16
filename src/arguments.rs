@@ -2,8 +2,6 @@ use std::{env, fs};
 
 use threadpool::ThreadPool;
 
-use crate::{Verbosity, simulations::{chunk_analysis, simulate, simulate_range}, techniques::Technique};
-
 /// Determines what the program should do depending on the arguments or lack of arguments passed to the program on launch.
 ///
 /// There are six paths that this could take.

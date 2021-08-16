@@ -1,10 +1,5 @@
 use std::{fs, path::Path, process};
 
-mod arguments;
-mod mining;
-mod simulations;
-mod techniques;
-
 fn main() {
     if verify_directory_structure() {
         arguments::handle();

@@ -2,12 +2,6 @@ use std::{collections::HashMap, fs::{self, File}, io::{BufRead, BufReader}, time
 
 use mvp_anvil::region::Region;
 
-use crate::{
-    mining,
-    techniques::{self, Technique},
-    Verbosity,
-};
-
 pub fn simulate_range(
     region_file_name: String,
     technique: Technique,

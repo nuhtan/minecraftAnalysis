@@ -1,9 +1,5 @@
 use mvp_anvil::region::Region;
 
-use crate::mining::{
-    get_block, poke, shift_coords, two_by_one_end, two_by_one_length, Direction, SimpleBlock,
-};
-
 #[derive(Clone)]
 pub enum Technique {
     Branch,
