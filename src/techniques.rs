@@ -15,6 +15,18 @@ impl Technique {
             Self::BranchWithPoke => String::from("poke"),
         }
     }
+
+    pub fn iterable() -> Vec<String> {
+        return vec!["Branch", "Branch with Poke Holes"].iter().map(|f| f.to_string()).collect();
+    }
+
+    pub fn from_string(text: String) -> Technique {
+        match text.as_str() {
+            "Branch" => Technique::Branch,
+            "Branch with Poke Holes" => Technique::BranchWithPoke,
+            _ => unreachable!("only techs")
+        }
+    }
 }
 
 pub fn branch_mining(
