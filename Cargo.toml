@@ -8,9 +8,15 @@ edition = "2018"
 name = "mcsim"
 path = "src/lib.rs"
 
+[[bin]]
+name = "launch"
+path = "src/bin/mc_analysis.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 mvp_anvil = { git = "https://github.com/nuhtan/mvp_anvil.git" }
 csv = "1.1.6"
 threadpool = "1.8.1"
+tui = { version = "0.16.0", features = ["crossterm"] }
+crossterm = "0.20.0"
