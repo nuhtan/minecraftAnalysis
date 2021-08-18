@@ -17,6 +17,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build Release
       run: cargo build --verbose --release
+    - name: Reduce Size
+      run: strip target/release/mc_analysis
     - name: Upload linux executable
       uses: actions/upload-artifact@v1
       with:
