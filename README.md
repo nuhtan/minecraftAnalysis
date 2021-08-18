@@ -31,5 +31,4 @@ cargo build --release
 - Create an explanation and comparison for results.
 - There should be comparisons within the mining techniques to see what parameters lead to the most efficient mining strategy.
 - Test cases and benchmarks.
-- CLI walk through as an alternative to inputting cli arguments.
-- Ore expansion should be added as an optional parameter.
+- CLI walk through as an alternative to inputting cli argument
