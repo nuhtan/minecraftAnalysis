@@ -220,24 +220,17 @@ fn simulation_ui(
 
         terminal
             .draw(|f| {
-                let base = Block::default()
-                    .borders(Borders::ALL)
-                    .border_type(BorderType::Rounded);
-                f.render_widget(base, f.size());
                 let sections = Layout::default()
                     .direction(Direction::Horizontal)
-                    .margin(1)
                     .constraints([Constraint::Percentage(70), Constraint::Percentage(30)].as_ref())
                     .split(f.size());
                 let left_sections = Layout::default()
                     .direction(Direction::Vertical)
-                    .margin(1)
                     .constraints([Constraint::Percentage(60), Constraint::Percentage(40)])
                     .split(sections[0]);
                 let right_sections = Layout::default()
                     .direction(Direction::Vertical)
-                    .margin(1)
-                    .constraints([Constraint::Percentage(20), Constraint::Percentage(80)])
+                    .constraints([Constraint::Percentage(30), Constraint::Percentage(70)])
                     .split(sections[1]);
                 let secs = start.elapsed().as_secs() % 60;
                 let mins = start.elapsed().as_secs() / 60;
@@ -246,14 +239,16 @@ fn simulation_ui(
                 let top_right = Paragraph::new(vec![
                     Spans::from(title.clone()),
                     Spans::from(format!("Duration: {}:{}:{}:{}", days, hours, mins, secs)),
-                ]);
+                ])
+                .block(Block::default().borders(Borders::ALL));
                 let bot_right = Paragraph::new(vec![
                     Spans::from(format!("{} Region Files", files)),
                     Spans::from(format!("{} Threads Allocated", threads)),
                     Spans::from(format!("{} Files Completed", completed)),
                     Spans::from(format!("{} Techniques", techniques)),
                     Spans::from(format!("Y: [{}, {}]", y_range.0, y_range.1)),
-                ]);
+                ])
+                .block(Block::default().borders(Borders::ALL));
                 let items: Vec<ListItem> = state
                     .items
                     .iter()
@@ -267,10 +262,9 @@ fn simulation_ui(
                         ))
                     })
                     .collect();
-                let top_left = List::new(items).highlight_style(Style::default().fg(Color::Cyan));
+                let top_left = List::new(items).highlight_style(Style::default().fg(Color::Cyan)).block(Block::default().borders(Borders::ALL));
                 let bot_left_sections = Layout::default()
                     .direction(Direction::Horizontal)
-                    .margin(1)
                     .constraints([Constraint::Percentage(40), Constraint::Percentage(60)])
                     .split(left_sections[1]);
                 let target = state.items[state.state.selected().unwrap()].clone();
@@ -283,13 +277,13 @@ fn simulation_ui(
                         target.start.elapsed().as_secs() % 60
                     )),
                     Spans::from(format!("Y: {}", target.y)),
-                ]);
+                ]).block(Block::default().borders(Borders::ALL));
                 let bot_left_right = Paragraph::new(vec![
                     Spans::from(format!("Blocks Mined: {}", target.mined)),
                     Spans::from(format!("Blocks Exposed: {}", target.exposed)),
                     Spans::from(format!("Lava: {}", target.lava)),
                     Spans::from(format!("Ores: {}", target.ores)),
-                ]);
+                ]).block(Block::default().borders(Borders::ALL));
                 f.render_widget(top_right, right_sections[0]);
                 f.render_widget(bot_right, right_sections[1]);
                 f.render_stateful_widget(top_left, left_sections[0], &mut state.state);
