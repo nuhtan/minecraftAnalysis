@@ -80,7 +80,7 @@ pub fn simulate(
     id: u32,
     sender: Sender<ProgramStatus>
 ) -> HashMap<String, i32> {
-    sender.send(ProgramStatus::StartingSim(id, technique.clone(), String::from("Starting Simulation"), Instant::now(), y)).unwrap();
+    sender.send(ProgramStatus::StartingSim(id, technique.clone(), region_file_name.clone(), Instant::now(), y)).unwrap();
     let region = Region::from_file(format!("regions/{}", region_file_name));
     let sim_results = match technique {
         Technique::Branch => {
