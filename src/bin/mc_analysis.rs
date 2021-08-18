@@ -763,6 +763,23 @@ fn determine_simulation() -> Result<(bool, Option<Simulations>), Error> {
                         }
                         _ => {}
                     },
+                    KeyCode::Backspace => match current_state {
+                        UIRenderState::ThreadCount => if state.threads.len() > 0 {
+                            state.threads = state.threads[0..state.threads.len() - 1].to_string();
+                        },
+                        UIRenderState::YLevel => if state.y_level.len() > 0 {
+                            state.y_level = state.y_level[0..state.y_level.len() - 1].to_string();
+                        },
+                        UIRenderState::YRange => match state.second_range {
+                            false => if state.min.len() > 0 {
+                                state.min = state.min[0..state.min.len() - 1].to_string();
+                            },
+                            true => if state.max.len() > 0 {
+                                state.max = state.max[0..state.max.len() - 1].to_string();
+                            }
+                        },
+                        _ => {}
+                    }
                     KeyCode::Esc => current_state = UIRenderState::Quit,
                     _ => {}
                 },
