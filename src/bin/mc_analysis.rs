@@ -238,13 +238,13 @@ fn simulation_ui(
                 let days = start.elapsed().as_secs() / (3600 * 24);
                 let top_right = Paragraph::new(vec![
                     Spans::from(title.clone()),
-                    Spans::from(format!("Duration: {}:{}:{}:{}", days, hours, mins, secs)),
+                    Spans::from(format!("Duration: {:02}:{:02}:{:02}:{:02}", days, hours, mins, secs)),
                 ])
                 .block(Block::default().borders(Borders::ALL));
                 let bot_right = Paragraph::new(vec![
                     Spans::from(format!("{} Region Files", files)),
                     Spans::from(format!("{} Threads Allocated", threads)),
-                    Spans::from(format!("{} Files Completed", completed)),
+                    Spans::from(format!("{} Simulations Completed", completed)),
                     Spans::from(format!("{} Techniques", techniques)),
                     Spans::from(format!("Y: [{}, {}]", y_range.0, y_range.1)),
                 ])
@@ -254,7 +254,7 @@ fn simulation_ui(
                     .iter()
                     .map(|i| {
                         ListItem::new(format!(
-                            "({}) {} - {}:{}",
+                            "({}) {} - {:02}:{:02}",
                             i.id,
                             i.activity,
                             i.start.elapsed().as_secs() / 60,
@@ -272,7 +272,7 @@ fn simulation_ui(
                     Spans::from(target.file),
                     Spans::from(target.activity),
                     Spans::from(format!(
-                        "{}:{}",
+                        "{:02}:{:02}",
                         target.start.elapsed().as_secs() / 60,
                         target.start.elapsed().as_secs() % 60
                     )),
