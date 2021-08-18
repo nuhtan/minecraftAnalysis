@@ -1,14 +1,16 @@
-use std::{collections::HashMap, fs::{self, File}, io::{BufRead, BufReader}, time::Instant};
+use std::{collections::HashMap, fs::{self, File}, io::{BufRead, BufReader}, sync::mpsc::Sender, time::Instant};
 
-use crate::{techniques::*, mining::Direction};
+use crate::{ProgramStatus, mining::Direction, techniques::*};
 
 use mvp_anvil::region::Region;
 
 pub fn simulate_range(
     region_file_name: String,
-    technique: Technique,
+    technique: &Technique,
     max: i32,
     min: i32,
+    id: u32,
+    sender: Sender<ProgramStatus>
 ) {
     let f_name = region_file_name.clone();
     let t = technique.clone();
@@ -29,7 +31,7 @@ pub fn simulate_range(
     let mut csv_writer = csv::Writer::from_path(format!(
         "mining_data/result-{}-{}.csv",
         region_file_name,
-        technique.name()
+        technique.clone().name()
     ))
     .unwrap();
     csv_writer
@@ -51,7 +53,7 @@ pub fn simulate_range(
     for y in min..max {
         let file_name = f_name.clone();
         let tech = t.clone();
-        let results = simulate(file_name, tech, y);
+        let results = simulate(file_name, tech, y, id, sender.clone());
         csv_writer
             .write_record(&[
                 y.to_string(),
@@ -75,12 +77,15 @@ pub fn simulate(
     region_file_name: String,
     technique: Technique,
     y: i32,
+    id: u32,
+    sender: Sender<ProgramStatus>
 ) -> HashMap<String, i32> {
+    sender.send(ProgramStatus::StartingSim(id, technique.clone(), String::from("Starting Simulation"), Instant::now(), y)).unwrap();
     let timer = Instant::now();
     let region = Region::from_file(format!("regions/{}", region_file_name));
     let sim_results = match technique {
         Technique::Branch => {
-            branch_mining(&region, &Direction::South, (255, y, 255), 16, 160, 5)
+            branch_mining(&region, &Direction::South, (255, y, 255), 16, 160, 5, id, sender.clone())
         }
         Technique::BranchWithPoke => branch_mining_with_poke_holes(
             &region,
@@ -90,10 +95,13 @@ pub fn simulate(
             25,
             5,
             12,
+            id,
+            sender.clone(),
         ),
     };
     let mut lava = Vec::new();
     let mut ores = Vec::new();
+    sender.send(ProgramStatus::UpdateSim(id, format!("Filtering Blocks"), sim_results.1, sim_results.2, lava.len() as u32, ores.len() as u32)).unwrap();
     let valid = get_valid_blocks();
     for block in sim_results.0 {
         if block.block == "lava" || block.block == "flowing_lava" {
@@ -112,7 +120,7 @@ pub fn simulate(
     results.insert(String::from("lapis"), 0);
     results.insert(String::from("coal"), 0);
     results.insert(String::from("emeralds"), 0);
-
+    sender.send(ProgramStatus::UpdateSim(id, format!("Compiling Results"), sim_results.1, sim_results.2, lava.len() as u32, ores.len() as u32)).unwrap();
     for mut ore in ores {
         if results.contains_key(valid.get(&mut ore.block).unwrap()) {
             let key = valid.get(&mut ore.block).unwrap();
@@ -129,11 +137,12 @@ pub fn simulate(
     results.insert(String::from("blocks mined"), sim_results.1 as i32);
     results.insert(String::from("blocks exposed"), sim_results.2 as i32);
     results.insert(String::from("lava"), lava.len() as i32);
-    println!("Simulation took {} secs", timer.elapsed().as_secs());
+    // println!("Simulation took {} secs", timer.elapsed().as_secs());
+    sender.send(ProgramStatus::FinishSim(id)).unwrap();
     return results;
 }
 
-pub fn chunk_analysis(region_file_name: String, max: i32, min: i32) {
+pub fn chunk_analysis(region_file_name: String, max: i32, min: i32, id: u32, sender: Sender<ProgramStatus>) {
     unimplemented!("Not yet cuh")
 }
 
