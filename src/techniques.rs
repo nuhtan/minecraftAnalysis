@@ -158,7 +158,7 @@ pub fn branch_mining(
         results.0.append(&mut res.0);
         results.1 += res.1;
         results.2 += res.2;
-        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch {}/{}", 2 + n, branch_pair_count * 2), results.1, results.2, 0, 0)).unwrap();
+        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch {}/{}", 2 + (n * 2), branch_pair_count * 2), results.1, results.2, 0, 0)).unwrap();
         let mut res = branch(
             region,
             branch_length,
@@ -172,7 +172,7 @@ pub fn branch_mining(
         results.0.append(&mut res.0);
         results.1 += res.1;
         results.2 += res.2;
-        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch {}/{}", 2 + n + 1, branch_pair_count * 2), results.1, results.2, 0, 0)).unwrap();
+        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch {}/{}", 2 + (n * 2) + 1, branch_pair_count * 2), results.1, results.2, 0, 0)).unwrap();
         let mut res = branch(
             region,
             branch_length,
@@ -342,7 +342,7 @@ pub fn branch_mining_with_poke_holes(
         results.0.append(&mut res.0);
         results.1 += res.1;
         results.2 += res.2;
-        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch {}/{}", 2 + n, branch_pair_count * 2), results.1, results.2, 0, 0)).unwrap();
+        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch {}/{}", 2 + (n * 2), branch_pair_count * 2), results.1, results.2, 0, 0)).unwrap();
         let mut res = branch(
             region,
             pokes_per_branch,
@@ -357,7 +357,7 @@ pub fn branch_mining_with_poke_holes(
         results.0.append(&mut res.0);
         results.1 += res.1;
         results.2 += res.2;
-        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch {}/{}", 2 + n + 1, branch_pair_count * 2), results.1, results.2, 0, 0)).unwrap();
+        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch {}/{}", 2 + (n * 2) + 1, branch_pair_count * 2), results.1, results.2, 0, 0)).unwrap();
         let mut res = branch(
             region,
             pokes_per_branch,
