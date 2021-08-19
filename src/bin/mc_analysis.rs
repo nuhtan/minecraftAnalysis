@@ -13,10 +13,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crossterm::{
-    event::{self, poll, Event, KeyCode},
-    terminal,
-};
+use crossterm::{event::{self, poll, Event, KeyCode}, terminal::{self, disable_raw_mode}};
 use mcsim::{techniques::Technique, ProgramStatus};
 use threadpool::ThreadPool;
 use tui::{
@@ -233,8 +230,8 @@ fn simulation_ui(
                     .constraints([Constraint::Percentage(30), Constraint::Percentage(70)])
                     .split(sections[1]);
                 let secs = start.elapsed().as_secs() % 60;
-                let mins = start.elapsed().as_secs() / 60;
-                let hours = start.elapsed().as_secs() / 3600;
+                let mins = (start.elapsed().as_secs() / 60) % 60;
+                let hours = (start.elapsed().as_secs() / 3600) % 24;
                 let days = start.elapsed().as_secs() / (3600 * 24);
                 let top_right = Paragraph::new(vec![
                     Spans::from(title.clone()),
@@ -267,23 +264,31 @@ fn simulation_ui(
                     .direction(Direction::Horizontal)
                     .constraints([Constraint::Percentage(40), Constraint::Percentage(60)])
                     .split(left_sections[1]);
-                let target = state.items[state.state.selected().unwrap()].clone();
-                let bot_left_left = Paragraph::new(vec![
-                    Spans::from(target.file),
-                    Spans::from(target.activity),
-                    Spans::from(format!(
-                        "{:02}:{:02}",
-                        target.start.elapsed().as_secs() / 60,
-                        target.start.elapsed().as_secs() % 60
-                    )),
-                    Spans::from(format!("Y: {}", target.y)),
-                ]).block(Block::default().borders(Borders::ALL));
-                let bot_left_right = Paragraph::new(vec![
-                    Spans::from(format!("Blocks Mined: {}", target.mined)),
-                    Spans::from(format!("Blocks Exposed: {}", target.exposed)),
-                    Spans::from(format!("Lava: {}", target.lava)),
-                    Spans::from(format!("Ores: {}", target.ores)),
-                ]).block(Block::default().borders(Borders::ALL));
+                let bot_left_left;
+                let bot_left_right;
+                if state.items.len() < 1 {
+                    bot_left_left = Paragraph::new("").block(Block::default().borders(Borders::ALL));
+                    bot_left_right = Paragraph::new("").block(Block::default().borders(Borders::ALL));
+                } else {
+                    let target = state.items[state.state.selected().unwrap()].clone();
+                    bot_left_left = Paragraph::new(vec![
+                        Spans::from(target.file),
+                        Spans::from(target.activity),
+                        Spans::from(format!(
+                            "{:02}:{:02}",
+                            target.start.elapsed().as_secs() / 60,
+                            target.start.elapsed().as_secs() % 60
+                        )),
+                        Spans::from(format!("Y: {}", target.y)),
+                    ]).block(Block::default().borders(Borders::ALL));
+                    bot_left_right = Paragraph::new(vec![
+                        Spans::from(format!("Blocks Mined: {}", target.mined)),
+                        Spans::from(format!("Blocks Exposed: {}", target.exposed)),
+                        Spans::from(format!("Lava: {}", target.lava)),
+                        Spans::from(format!("Ores: {}", target.ores)),
+                    ]).block(Block::default().borders(Borders::ALL));
+                }
+                
                 f.render_widget(top_right, right_sections[0]);
                 f.render_widget(bot_right, right_sections[1]);
                 f.render_stateful_widget(top_left, left_sections[0], &mut state.state);
@@ -311,6 +316,7 @@ fn simulation_ui(
     }
     terminal.clear().unwrap();
     terminal.set_cursor(0, 0).unwrap();
+    disable_raw_mode().unwrap();
 }
 
 fn determine_simulation() -> Result<(bool, Option<Simulations>), Error> {
