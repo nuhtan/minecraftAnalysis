@@ -11,7 +11,7 @@
 - [results.py](results.py) Contains the code that generates graphs using data from [mining_data](mining_data/).
 - [ValidBlocks.txt](ValidBlocks.txt) Contains the blocks that the simulations check for along with the output parameters.
 
-## How to install (Not Accurate):
+## How to install and run:
 ```
 git clone https://github.com/nuhtan/minecraftAnalysis.git
 ```
@@ -19,16 +19,19 @@ git clone https://github.com/nuhtan/minecraftAnalysis.git
 cargo build --release
 ```
 ```
-./target/release/minecraft_analysis help
+./target/release/mc_analysis
 ```
 
 ## What still needs to be done:
-- Documentation still needs to be finished for rust files.
+- Documentation for rust files and results.py.
 - Get Nick's R files and include them.
 - [results.py](results.py) should be broken into functions for easier reading and reusability.
 - Results should also generate stacked bar graphs to compare the different mining strategies directly.
-- Results should be changed to be a ratio of the block in question compared to the number of blocks mined/exposed.
 - Create an explanation and comparison for results.
 - There should be comparisons within the mining techniques to see what parameters lead to the most efficient mining strategy.
 - Test cases and benchmarks.
-- CLI walk through as an alternative to inputting cli argument
+- Chunk Simulations for general ore distributions.
+- Internal documentation for more complex sections of the code.
+- UI needs to handle the alternative simulations, chunk and parameter testing.
+- Github pages to host conclusions.
+- Upload this and mvp_anvil to crates.io.
