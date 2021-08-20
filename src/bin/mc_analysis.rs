@@ -125,6 +125,7 @@ fn main() -> Result<(), Error> {
                                         );
                                     });
                                 }
+                                id += 1;
                             }
                             title = String::from("Technique Comparison Simulation");
                             allocated_threads = threads;

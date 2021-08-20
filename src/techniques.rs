@@ -1,6 +1,6 @@
 use std::sync::mpsc::Sender;
 
-use mvp_anvil::region::Region;
+use mvp_anvil::{chunk::Chunk, region::Region};
 
 use crate::{ProgramStatus, mining::*};
 
@@ -8,6 +8,7 @@ use crate::{ProgramStatus, mining::*};
 pub enum Technique {
     Branch,
     BranchWithPoke,
+    Chunk,
 }
 
 impl Technique {
@@ -15,6 +16,7 @@ impl Technique {
         match self {
             Self::Branch => String::from("branch"),
             Self::BranchWithPoke => String::from("poke"),
+            Self::Chunk => String::from("chunk"),
         }
     }
 
@@ -374,5 +376,16 @@ pub fn branch_mining_with_poke_holes(
         results.2 += res.2;
     }
 
+    return results;
+}
+
+pub fn chunks(chunk: &Chunk, y: i32, id: u32, sender: Sender<ProgramStatus>) -> Vec<String> {
+    sender.send(ProgramStatus::UpdateSim(id, format!("Analyzing y: {}", y), 0, 0, 0, 0)).unwrap();
+    let mut results = Vec::new();
+    for x in 0..16 {
+        for z in 0..16 {
+            results.push(chunk.get_block(x, y, z).id);
+        }
+    }
     return results;
 }
