@@ -35,3 +35,7 @@ cargo build --release
 - UI needs to handle the alternative simulations, chunk and parameter testing.
 - Github pages to host conclusions.
 - Upload this and mvp_anvil to crates.io.
+- Exit during simulation.
+- Less destructive exits, files should be saved after each y level not only once the entire range has been simulated.
+- Predict finish time for simulations?
+- Change UI color choices.
