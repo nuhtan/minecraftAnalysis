@@ -853,8 +853,13 @@ fn determine_simulation() -> Result<(bool, Option<Simulations>), Error> {
 // Create mining_data, regions, if they are not already present. Fetch ValidBlocks.txt if it is not present.
 fn verify_directory_structure() -> bool {
     let mut regions = true;
+    // These two paths should be changed to create the dir and handle the error rather than 
     if !Path::new("mining_data/").exists() {
         fs::create_dir("mining_data/").unwrap();
+    }
+
+    if !Path::new("chunk_data/").exists() {
+        fs::create_dir("chunk_data/").unwrap();
     }
 
     if !Path::new("regions/").exists() {
