@@ -11,22 +11,25 @@ TODO
 - [graphical_results/](graphical_results/): Contains graphs from different simulations.
 - [src/](src/): Contains the rust source code that runs and manages the simulations.
     - [bin/](src/bin/): Contains files related to the executable of the project.
-        - [mc_analysis.rs](): Contains the code to launch the simulations.
-        - [ui.rs](): Contains the code to draw a ui for selecting the simulation type and parameters along with a ui for monitoring simulations.
-    - [lib.rs](): Contains a small amount of code relating to updating simulation status.
-    - [mining.rs](): Contains functions that make up the steps to simulate mining such as mining a 2x1 or 1x1 hole in a horizontal direction.
-    - [simulations.rs](): Contains functions that handle the larger task of simulating a mining technique. These functions go through the process of using techniques to get blocks, trimming possible duplicate blocks (this shouldn't happen?), categorizing blocks, and recording data.
-    - [techniques.rs](): Contains the various techniques that are simulated.
+        - [mc_analysis.rs](src/bin/mc_analysis.rs): Contains the code to launch the simulations.
+        - [ui.rs](#): Contains the code to draw a ui for selecting the simulation type and parameters along with a ui for monitoring simulations.
+    - [lib.rs](src/lib.rs): Contains a small amount of code relating to updating simulation status.
+    - [mining.rs](src/mining.rs): Contains functions that make up the steps to simulate mining such as mining a 2x1 or 1x1 hole in a horizontal direction.
+    - [simulations.rs](src/simulations.rs): Contains functions that handle the larger task of simulating a mining technique. These functions go through the process of using techniques to get blocks, trimming possible duplicate blocks (this shouldn't happen?), categorizing blocks, and recording data.
+    - [techniques.rs](src/techniques.rs): Contains the various techniques that are simulated.
 - [static/](static/): Contains the files for the website that hosts the analysis.
+- [index.html](): 
+- [results.py]():
+- [ValidBlocks.txt]():
 
 ## Libraries used in the creation of this project:
 - [anvil-parser](https://github.com/matcool/anvil-parser): This is the original Python library that was used to get block data from Minecraft worlds.
 - [anvil-parser (fork)](https://github.com/nuhtan/anvil-parser): This is my fork of anvil-parser that has changes to allow access to the new block height ranges.
-- [depreciated_minecraft_analysis](https://github.com/nuhtan/depreciated_minecraft_analysis): This was the original code for this project before performance concerns and scope creep became concerns.
+- [depreciated_minecraft_analysis](https://github.com/nuhtan/depreciated_minecraft_analysis): This was the original code for this project before performance concerns and scope creep became relevant.
 - [hematite-nbt](https://github.com/PistonDevelopers/hematite_nbt): The Rust library to read the nbt file structure that Minecraft region files use.
-- [mvp_anvil](https://github.com/nuhtan/mvp_anvil): A custom Rust library that provides support for getting regions, chunks, and blocks out of the [Blobs](https://docs.rs/hematite-nbt/0.5.2/nbt/struct.Blob.html) that [hematite-nbt](https://github.com/PistonDevelopers/hematite_nbt) returns for region files.
+- [mvp_anvil](https://github.com/nuhtan/mvp_anvil): A custom Rust library that provides support for getting regions, chunks, and blocks out of the [Blobs](https://docs.rs/hematite-nbt/0.5.2/nbt/struct.Blob.html) that [hematite-nbt](https://github.com/PistonDevelopers/hematite_nbt) returns for region files. The code is a port of relevant sections of [anvil-parser](https://github.com/matcool/anvil-parser).
 - [csv](https://github.com/BurntSushi/rust-csv): A Rust library for interacting with .csv files.
-- [threadpool](https://github.com/rust-threadpool/rust-threadpool): A library that provides a Struct to manage launch multithreaded workloads on a fixed number of worker threads.
+- [threadpool](https://github.com/rust-threadpool/rust-threadpool): A library that provides a Struct to manage and launch multithreaded workloads on a fixed number of worker threads.
 - [tui](https://github.com/fdehau/tui-rs): A terminal ui library, the [crossterm](https://github.com/crossterm-rs/crossterm) library is being used as a backend for better support on more OS's.
 
 ## How to install and run:
@@ -52,6 +55,11 @@ cargo build --release
 - You can now run './target/release/mc_analysis' or /target/release/mc_analysis.exe'.
 - Continue from step 5 of the prebuilt executable instructions.
 
+## Techniques that are currently included:
+- Chunk: Rather than a technique this is a full gathering of target blocks from each y layer of each chunk of each region file.
+- Branch:
+- Branch w/ Poke Holes:
+
 ## What still needs to be done:
 - Documentation for rust files and results.py.
 - Get Nick's R files and include them.
@@ -70,3 +78,4 @@ cargo build --release
 - Predict finish time for simulations?
 - Change UI color choices.
 - Update the directories that are being created if they do not already exist.
+- Adding more monitoring data to running simulations.
