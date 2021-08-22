@@ -68,7 +68,6 @@ cargo build --release
 - Create an explanation and comparison for results.
 - There should be comparisons within the mining techniques to see what parameters lead to the most efficient mining strategy.
 - Test cases and benchmarks.
-- Chunk Simulations for general ore distributions.
 - Internal documentation for more complex sections of the code.
 - UI needs to handle the alternative simulations, chunk and parameter testing.
 - Github pages to host conclusions.
@@ -77,5 +76,4 @@ cargo build --release
 - Less destructive exits, files should be saved after each y level not only once the entire range has been simulated.
 - Predict finish time for simulations?
 - Change UI color choices.
-- Update the directories that are being created if they do not already exist.
 - Adding more monitoring data to running simulations.
