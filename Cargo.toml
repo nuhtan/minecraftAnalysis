@@ -10,7 +10,7 @@ path = "src/lib.rs"
 
 [[bin]]
 name = "mc_analysis"
-path = "src/bin/mc_analysis.rs"
+path = "src/bin/main.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
