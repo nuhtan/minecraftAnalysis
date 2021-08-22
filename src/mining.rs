@@ -57,58 +57,6 @@ pub fn shift_coords(
     return coords;
 }
 
-// pub fn iterable_ore_expansion(
-//     region: Region,
-//     valid: HashMap<String, String>,
-//     coords: (i32, i32, i32),
-// ) -> (Vec<SimpleBlock>, Vec<SimpleBlock>) {
-//     let mut deq = VecDeque::new();
-//     let loop_reg = region.clone();
-//     deq.push_back(SimpleBlock::new(coords, get_block(region, coords)));
-//     let mut expanded = Vec::new();
-//     let mut exposed = Vec::new();
-
-//     while deq.len() > 0 {
-//         let reg = loop_reg.clone();
-//         let block = deq.pop_front().unwrap();
-//         let cen_block = block.clone();
-//         &expanded.push(block);
-//         for x in -1..2 {
-//             for y in -1..2 {
-//                 for z in -1..2 {
-//                     let adj_reg = reg.clone();
-//                     let adj_reg2 = reg.clone();
-//                     let new_coords = (cen_block.x + x, cen_block.y + y, cen_block.z + z);
-//                     let exp = SimpleBlock::new(new_coords, get_block(adj_reg, new_coords));
-//                     exposed.push(exp);
-//                     if !(x == 0 && y == 0 && z == 0) {
-//                         let adj = SimpleBlock::new(new_coords, get_block(adj_reg2, new_coords));
-//                         if valid.contains_key(&adj.block) {
-//                             let mut found = false;
-//                             let exp = expanded.clone();
-//                             for b in exp {
-//                                 if b == adj {
-//                                     found = true;
-//                                 }
-//                             }
-//                             for b in &deq {
-//                                 if *b == adj {
-//                                     found = true;
-//                                 }
-//                             }
-//                             if !found {
-//                                 deq.push_back(adj);
-//                             }
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//     }
-
-//     return (expanded, exposed);
-// }
-
 /// Takes a region file and coordinates and returns the name of the block at that location. This handles the intermediary step of determining the x and z [chunks](`mvp_anvil::chunk::Chunk`) that correspond with the coordinates.
 ///
 /// * `region` - The [region](`mvp_anvil::region::Region`) file that the block will be retrieved from.
