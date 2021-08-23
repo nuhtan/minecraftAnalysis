@@ -3,7 +3,7 @@ use std::{fs, io::Error, sync::{Arc, Mutex, mpsc}, thread, time::Instant};
 use threadpool::ThreadPool;
 
 fn main() -> Result<(), Error> {
-    match mcsim::ui::determine_simulation() {
+    match mcsim::ui::simulation_target::determine_simulation() {
         Ok(cont) => {
             match cont.0 {
                 true => {
@@ -21,7 +21,7 @@ fn main() -> Result<(), Error> {
                     let mut pool = ThreadPool::new(1);
                     let mut id = 0;
                     match cont.1.unwrap() {
-                        mcsim::Simulations::Single(tech, file_name, y) => {
+                        mcsim::ui::Simulations::Single(tech, file_name, y) => {
                             pool.execute(move || {
                                 mcsim::simulations::simulate(file_name, tech, y, id, transmitter);
                             });
@@ -31,7 +31,7 @@ fn main() -> Result<(), Error> {
                             techniques = 1;
                             y_range = (y, y);
                         }
-                        mcsim::Simulations::Range(tech, file_name, min, max) => {
+                        mcsim::ui::Simulations::Range(tech, file_name, min, max) => {
                             pool.execute(move || {
                                 mcsim::simulations::simulate_range(
                                     file_name,
@@ -48,7 +48,7 @@ fn main() -> Result<(), Error> {
                             techniques = 1;
                             y_range = (min, max);
                         }
-                        mcsim::Simulations::Techniques(techs, min, max, threads) => {
+                        mcsim::ui::Simulations::Techniques(techs, min, max, threads) => {
                             let mut file_count = 0;
                             pool = ThreadPool::new(threads as usize);
                             for file in fs::read_dir("regions").unwrap() {
@@ -78,7 +78,7 @@ fn main() -> Result<(), Error> {
                             techniques = techs.len();
                             y_range = (min, max);
                         }
-                        mcsim::Simulations::TechniqueParameters(techs, min, max, threads) => {
+                        mcsim::ui::Simulations::TechniqueParameters(techs, min, max, threads) => {
                             todo!("yeah, not yet");
                             title = String::from("Technique Parameters Simulation");
                             allocated_threads = threads;
@@ -86,11 +86,13 @@ fn main() -> Result<(), Error> {
                             techniques = techs.len();
                             y_range = (min, max);
                         }
-                        mcsim::Simulations::Chunks(min, max, threads) => {
+                        mcsim::ui::Simulations::Chunks(min, max, threads) => {
+                            let mut file_count = 0;
                             pool = ThreadPool::new(threads as usize);
                             for file in fs::read_dir("regions").unwrap() {
                                 let file = file.unwrap();
                                 if file.file_name().to_str().unwrap().contains(".mca") {
+                                    file_count += 1;
                                     let transmitter = transmitter.clone();
                                     pool.execute(move || {
                                         mcsim::simulations::chunk_analysis(
@@ -106,14 +108,14 @@ fn main() -> Result<(), Error> {
                             }
                             title = String::from("Technique Comparison Simulation");
                             allocated_threads = threads;
-                            files = 0;
+                            files = file_count;
                             techniques = 1;
                             y_range = (min, max);
                         }
                     }
                     // Create thread with sim ui
                     let handle = thread::spawn(move || {
-                        mcsim::ui::simulation_ui(
+                        mcsim::ui::simulation::simulation_ui(
                             receiver,
                             sim_end,
                             title,
