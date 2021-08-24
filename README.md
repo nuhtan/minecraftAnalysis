@@ -6,7 +6,7 @@ TODO
 ## Project Layout Description:
 - [chunk_data/](chunk_data/): Contains simulated data from the current [region files](regions/).
 - [mining_data/](mining_data/): Contains simulated data for each of the [current techniques] for each of the [region files](regions/).
-- [regions/](regions/): Contains fully generated region files from Minecraft 1.18 Experimental Snapshot 4. These files were generated using the [world-pregen](https://github.com/GoldenDelicios/world-pregen) datapack.
+- [regions/](regions/): Contains fully generated region files from Minecraft 1.18 Experimental Snapshot 4. These files were generated using the [world-pregen](https://github.com/GoldenDelicios/world-pregen) datapack. Files are from seed: 3686983410240111049.
 - [results/](results/): Contains csv files that have been processed and are ready for display.
 - [graphical_results/](graphical_results/): Contains graphs from different simulations.
 - [src/](src/): Contains the rust source code that runs and manages the simulations.
