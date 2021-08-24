@@ -379,8 +379,7 @@ pub fn branch_mining_with_poke_holes(
     return results;
 }
 
-pub fn chunks(chunk: &Chunk, y: i32, id: u32, sender: Sender<ProgramStatus>) -> Vec<String> {
-    sender.send(ProgramStatus::UpdateSim(id, format!("Analyzing y: {}", y), 0, 0, 0, 0)).unwrap();
+pub fn chunks(chunk: &Chunk, y: i32) -> Vec<String> {
     let mut results = Vec::new();
     for x in 0..16 {
         for z in 0..16 {

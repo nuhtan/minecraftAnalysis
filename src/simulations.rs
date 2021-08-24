@@ -198,32 +198,32 @@ pub fn chunk_analysis(
         .unwrap();
     let region = Region::from_file(format!("regions/{}", region_file_name));
     sender
-                    .send(ProgramStatus::StartingSim(
-                        id,
-                        Technique::Chunk,
-                        region_file_name.clone(),
-                        Instant::now(),
-                        0,
-                    ))
-                    .unwrap();
+        .send(ProgramStatus::StartingSim(
+            id,
+            Technique::Chunk,
+            region_file_name.clone(),
+            Instant::now(),
+            0,
+        ))
+        .unwrap();
+    sender
+        .send(ProgramStatus::UpdateSim(
+            id,
+            format!("Processing Chunks"),
+            0,
+            0,
+            0,
+            0,
+        ))
+        .unwrap();
     for x in 0..32 {
         for z in 0..32 {
             let chunk = region.get_chunk(x, z);
             for y in min..max {
-                let blocks = techniques::chunks(&chunk, y, id, sender.clone());
+                let blocks = techniques::chunks(&chunk, y);
                 let mut lava = 0;
                 let mut ores = Vec::new();
                 let mut air = 0;
-                sender
-                    .send(ProgramStatus::UpdateSim(
-                        id,
-                        format!("Filtering Blocks"),
-                        0,
-                        0,
-                        lava as u32,
-                        ores.len() as u32,
-                    ))
-                    .unwrap();
                 let valid = get_valid_blocks();
                 for block in blocks {
                     if block.as_str() == "lava" || block.as_str() == "flowing_lava" {
@@ -244,16 +244,6 @@ pub fn chunk_analysis(
                 results.insert(String::from("lapis"), 0);
                 results.insert(String::from("coal"), 0);
                 results.insert(String::from("emeralds"), 0);
-                sender
-                    .send(ProgramStatus::UpdateSim(
-                        id,
-                        format!("Compiling Results"),
-                        0,
-                        0,
-                        lava as u32,
-                        ores.len() as u32,
-                    ))
-                    .unwrap();
                 for mut ore in ores {
                     let key = valid.get(&mut ore).unwrap();
                     if let Some(c) = results.get_mut(key) {
@@ -278,7 +268,6 @@ pub fn chunk_analysis(
                         results.get("diamonds").unwrap().to_string(),
                     ])
                     .unwrap();
-                
             }
         }
     }
