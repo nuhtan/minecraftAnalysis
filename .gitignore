@@ -1,3 +1,5 @@
 /target
 /.vscode
+/mining_data
+/chunk_data
 Cargo.lock
