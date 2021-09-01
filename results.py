@@ -2,6 +2,8 @@ import os
 from typing import Dict
 from pandas.core.frame import DataFrame
 import pandas
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 outDir = "results"
 chunkDir = "chunk_data"
@@ -16,7 +18,6 @@ def chunk_data():
         with open('chunk_data/' + filename) as file:
             data = pandas.read_csv(file)
             files.append(data)
-
     print("Files added")
 
     combined = pandas.concat(files)
@@ -38,6 +39,25 @@ def chunk_data():
     for subset in container:
         blockData = container[subset]
         blockData[blockData['y'] <= 62].to_csv("results/" + subset + "_chunks.csv", index=False)
+
+def chunk_graphs():
+    sns.set_theme()
+    for filename in os.listdir(outDir):
+        if filename.count("chunks") > 0: # Only want the chunk data for this
+            plt.figure(figsize=(35, 10))
+            dataset: DataFrame = pandas.read_csv('results/' + filename)
+            figure = sns.lineplot(data=dataset, x="y", y="avgBlocksPerChunk")
+            if filename.count("full") > 0: # The full range needs slight changes
+                figure.set_xlim([-64, 400])
+                figure.set_title("Air Blocks Full Range")
+                plt.savefig("graphical_results/chunks_air_full.png")
+            else:
+                figure.set_xlim([-64, 65])
+                figure.set_title(filename.split("_")[0])
+                plt.savefig("graphical_results/chunks_" + filename.split("_")[0] + ".png")
+            
+chunk_graphs()
+
 #%% 
 # sns.set_theme()
 # figure = sns.lineplot(data=list(container["air"].values()))
