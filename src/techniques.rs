@@ -41,7 +41,6 @@ pub fn branch_mining(
     branch_length: i32,
     branch_spacing: i32,
     id: u32,
-    sender: Sender<ProgramStatus>,
 ) -> (Vec<SimpleBlock>, u32, u32) {
     if branch_spacing < 2 {
         panic!("Branch spacing should be at least two to avoid duplicates")
@@ -129,7 +128,6 @@ pub fn branch_mining(
         } else {
             (&Direction::East, &Direction::West)
         };
-        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch 1/{}", branch_pair_count * 2), 0, 0, 0, 0)).unwrap();
     let mut res = branch(
         region,
         branch_length,
@@ -139,7 +137,6 @@ pub fn branch_mining(
     results.0.append(&mut res.0);
     results.1 += res.1;
     results.2 += res.2;
-    sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch 2/{}", branch_pair_count * 2), results.1, results.2, 0, 0)).unwrap();
     let mut res = branch(
         region,
         branch_length,
@@ -150,7 +147,6 @@ pub fn branch_mining(
     results.1 += res.1;
     results.2 += res.2;
     for n in 0..branch_pair_count - 1 {
-        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Corridor"), results.1, results.2, 0, 0)).unwrap();
         let mut res = expand_corridor(
             region,
             base_direction,
@@ -160,7 +156,6 @@ pub fn branch_mining(
         results.0.append(&mut res.0);
         results.1 += res.1;
         results.2 += res.2;
-        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch {}/{}", 2 + (n * 2), branch_pair_count * 2), results.1, results.2, 0, 0)).unwrap();
         let mut res = branch(
             region,
             branch_length,
@@ -174,7 +169,6 @@ pub fn branch_mining(
         results.0.append(&mut res.0);
         results.1 += res.1;
         results.2 += res.2;
-        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch {}/{}", 2 + (n * 2) + 1, branch_pair_count * 2), results.1, results.2, 0, 0)).unwrap();
         let mut res = branch(
             region,
             branch_length,
@@ -202,7 +196,6 @@ pub fn branch_mining_with_poke_holes(
     poke_spacing: i32,
     branch_spacing: i32,
     id: u32,
-    sender: Sender<ProgramStatus>,
 ) -> (Vec<SimpleBlock>, u32, u32) {
     fn expand_corridor(
         region: &mut CachingRegion,
@@ -311,7 +304,6 @@ pub fn branch_mining_with_poke_holes(
         } else {
             (&Direction::East, &Direction::West)
         };
-    sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch 1/{}", branch_pair_count * 2), 0, 0, 0, 0)).unwrap();
     let mut res = branch(
         region,
         pokes_per_branch,
@@ -322,7 +314,6 @@ pub fn branch_mining_with_poke_holes(
     results.0.append(&mut res.0);
     results.1 += res.1;
     results.2 += res.2;
-    sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch 2/{}", branch_pair_count * 2), results.1, results.2, 0, 0)).unwrap();
     let mut res = branch(
         region,
         pokes_per_branch,
@@ -334,7 +325,6 @@ pub fn branch_mining_with_poke_holes(
     results.1 += res.1;
     results.2 += res.2;
     for n in 0..branch_pair_count - 1 {
-        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Corridor"), results.1, results.2, 0, 0)).unwrap();
         let mut res = expand_corridor(
             region,
             base_direction,
@@ -344,7 +334,6 @@ pub fn branch_mining_with_poke_holes(
         results.0.append(&mut res.0);
         results.1 += res.1;
         results.2 += res.2;
-        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch {}/{}", 2 + (n * 2), branch_pair_count * 2), results.1, results.2, 0, 0)).unwrap();
         let mut res = branch(
             region,
             pokes_per_branch,
@@ -359,7 +348,6 @@ pub fn branch_mining_with_poke_holes(
         results.0.append(&mut res.0);
         results.1 += res.1;
         results.2 += res.2;
-        sender.send(ProgramStatus::UpdateSim(id, format!("Simulating Branch {}/{}", 2 + (n * 2) + 1, branch_pair_count * 2), results.1, results.2, 0, 0)).unwrap();
         let mut res = branch(
             region,
             pokes_per_branch,

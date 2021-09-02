@@ -106,7 +106,6 @@ pub fn simulate(
             160,
             5,
             id,
-            sender.clone(),
         ),
         Technique::BranchWithPoke => branch_mining_with_poke_holes(
             &mut r,
@@ -117,7 +116,6 @@ pub fn simulate(
             5,
             12,
             id,
-            sender.clone(),
         ),
         _ => unreachable!("Don't do a basic simulation on a non standard technique."),
     };
