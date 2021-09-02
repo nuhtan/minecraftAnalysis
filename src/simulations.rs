@@ -8,11 +8,7 @@ use std::{
 
 use mvp_anvil::region::Region;
 
-use crate::{
-    mining::Direction,
-    techniques::{self, branch_mining, branch_mining_with_poke_holes, chunks, Technique},
-    ProgramStatus,
-};
+use crate::{CachingRegion, ProgramStatus, mining::Direction, techniques::{self, branch_mining, branch_mining_with_poke_holes, chunks, Technique}};
 
 pub fn simulate_range(
     region_file_name: String,
@@ -100,9 +96,10 @@ pub fn simulate(
         ))
         .unwrap();
     let region = Region::from_file(format!("regions/{}", region_file_name));
+    let mut r = CachingRegion::new(&region);
     let sim_results = match technique {
         Technique::Branch => branch_mining(
-            &region,
+            &mut r,
             &Direction::South,
             (255, y, 255),
             16,
@@ -112,7 +109,7 @@ pub fn simulate(
             sender.clone(),
         ),
         Technique::BranchWithPoke => branch_mining_with_poke_holes(
-            &region,
+            &mut r,
             &Direction::South,
             (255, y, 255),
             10,
@@ -216,11 +213,13 @@ pub fn chunk_analysis(
             0,
         ))
         .unwrap();
+    let mut tot_avg = 0;
     for x in 0..32 {
         for z in 0..32 {
             let chunk = region.get_chunk(x, z);
             for y in min..max {
-                let blocks = techniques::chunks(&chunk, y);
+                let (blocks, avg) = techniques::chunks(&chunk, y);
+                tot_avg += avg;
                 let mut lava = 0;
                 let mut ores = Vec::new();
                 let mut air = 0;
@@ -271,6 +270,7 @@ pub fn chunk_analysis(
             }
         }
     }
+    println!("Took {} ns on avg.", tot_avg / 1024 / ((max - min) as u128));
     sender.send(ProgramStatus::FinishSim(id)).unwrap();
 }
 

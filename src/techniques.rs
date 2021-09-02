@@ -1,8 +1,8 @@
-use std::sync::mpsc::Sender;
+use std::{sync::mpsc::Sender, time::Instant};
 
 use mvp_anvil::{chunk::Chunk, region::Region};
 
-use crate::{ProgramStatus, mining::*};
+use crate::{CachingRegion, ProgramStatus, mining::*};
 
 #[derive(Clone)]
 pub enum Technique {
@@ -34,7 +34,7 @@ impl Technique {
 }
 
 pub fn branch_mining(
-    region: &Region,
+    region: &mut CachingRegion,
     base_direction: &Direction,
     starting_coords: (i32, i32, i32),
     branch_pair_count: i32,
@@ -48,7 +48,7 @@ pub fn branch_mining(
     }
 
     fn expand_corridor(
-        region: &Region,
+        region: &mut CachingRegion,
         direction: &Direction,
         branch_spacing: i32,
         coords: (i32, i32, i32),
@@ -98,7 +98,7 @@ pub fn branch_mining(
     }
 
     fn branch(
-        region: &Region,
+        region: &mut CachingRegion,
         branch_length: i32,
         direction: &Direction,
         coords: (i32, i32, i32),
@@ -194,7 +194,7 @@ pub fn branch_mining(
 }
 
 pub fn branch_mining_with_poke_holes(
-    region: &Region,
+    region: &mut CachingRegion,
     base_direction: &Direction,
     starting_coords: (i32, i32, i32),
     branch_pair_count: i32,
@@ -205,7 +205,7 @@ pub fn branch_mining_with_poke_holes(
     sender: Sender<ProgramStatus>,
 ) -> (Vec<SimpleBlock>, u32, u32) {
     fn expand_corridor(
-        region: &Region,
+        region: &mut CachingRegion,
         direction: &Direction,
         branch_spacing: i32,
         coords: (i32, i32, i32),
@@ -255,7 +255,7 @@ pub fn branch_mining_with_poke_holes(
     }
 
     fn branch(
-        region: &Region,
+        region: &mut CachingRegion,
         pokes_per_branch: i32,
         poke_spacing: i32,
         direction: &Direction,
@@ -379,12 +379,17 @@ pub fn branch_mining_with_poke_holes(
     return results;
 }
 
-pub fn chunks(chunk: &Chunk, y: i32) -> Vec<String> {
+pub fn chunks(chunk: &Chunk, y: i32) -> (Vec<String>, u128) {
     let mut results = Vec::new();
+    let mut total = 0;
     for x in 0..16 {
         for z in 0..16 {
+            let start = Instant::now();
             results.push(chunk.get_block(x, y, z).id);
+            total += start.elapsed().as_nanos();
+            // println!("Chunks block took: {}ns", start.elapsed().as_nanos())
         }
     }
-    return results;
+    // println!("Avg of {}ns", total / 256);
+    return (results, total / 256);
 }
