@@ -1,3 +1,4 @@
+#%%
 import os
 from typing import Dict
 from pandas.core.frame import DataFrame
@@ -5,6 +6,7 @@ import pandas
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+#%%
 outDir = "results"
 chunkDir = "chunk_data"
 miningDir = "mining_data"
@@ -38,7 +40,7 @@ def chunk_data():
     air.to_csv("results/chunks_air_full_range.csv")
     for subset in container:
         blockData = container[subset]
-        blockData[blockData['y'] <= 62].to_csv("results/" + subset + "_chunks.csv", index=False)
+        blockData[blockData['y'] <= 65].to_csv("results/" + subset + "_chunks.csv", index=False)
 
 def chunk_graphs():
     sns.set_theme()
@@ -48,15 +50,72 @@ def chunk_graphs():
             dataset: DataFrame = pandas.read_csv('results/' + filename)
             figure = sns.lineplot(data=dataset, x="y", y="avgBlocksPerChunk")
             if filename.count("full") > 0: # The full range needs slight changes
-                figure.set_xlim([-64, 400])
+                figure.set_xlim([-64, 320])
+                figure.set_ylim([0, 260])
                 figure.set_title("Air Blocks Full Range")
                 plt.savefig("graphical_results/chunks_air_full.png")
             else:
                 figure.set_xlim([-64, 65])
                 figure.set_title(filename.split("_")[0])
                 plt.savefig("graphical_results/chunks_" + filename.split("_")[0] + ".png")
-            
-chunk_graphs()
+
+def techniqueData():
+    t1 = []
+    t2 = []
+    container1: Dict[str, DataFrame] = {}
+    container2: Dict[str, DataFrame] = {}
+
+    for filename in os.listdir(miningDir):
+        with open('mining_data/' + filename) as file:
+            data = pandas.read_csv(file)
+            if filename.count("branch") > 0:
+                t1.append(data)
+            else:
+                t2.append(data)
+    print("Files added")
+
+    combined1 = pandas.concat(t1)
+    combined2 = pandas.concat(t2)
+    print("Files combined")
+
+    for col in combined1.columns[3:]:
+        container1[col] = DataFrame(columns=['y', 'blocksPerSimulation'])
+        container2[col] = DataFrame(columns=['y', 'blocksPerSimulation'])
+    print("Columns added")
+
+    for y in range(-64, 65):
+        y_df1 = combined1[combined1['y'] == y]
+        y_df2 = combined2[combined2['y'] == y]
+        for col in y_df1.columns[3:]:
+            container1[col] = container1[col].append({'y': y, 'blocksPerSimulation': y_df1.mean()[col]}, ignore_index=True)
+        for col in y_df2.columns[3:]:
+            container2[col] = container2[col].append({'y': y, 'blocksPerSimulation': y_df2.mean()[col]}, ignore_index=True)
+
+    for subset in container1:
+        blockData = container1[subset]
+        blockData.to_csv("results/" + subset + "_branch.csv", index=False)
+    for subset in container2:
+        blockData = container2[subset]
+        blockData.to_csv("results/" + subset + "_poke.csv", index=False)
+
+def technique_graphs():
+    sns.set_theme()
+    for filename in os.listdir(outDir):
+        if filename.count("branch") > 0 or filename.count("poke") > 0: # Only want the chunk data for this
+            plt.figure(figsize=(35, 10))
+            dataset: DataFrame = pandas.read_csv('results/' + filename)
+            figure = sns.lineplot(data=dataset, x="y", y="blocksPerSimulation")
+            figure.set_xlim([-64, 65])
+            figure.set_title(filename.split("_")[0])
+            if filename.count("branch") > 0:
+                plt.savefig("graphical_results/branch_" + filename.split("_")[0] + ".png")
+            else:
+                plt.savefig("graphical_results/poke_" + filename.split("_")[0] + ".png")
+
+# chunk_data()            
+# chunk_graphs()
+# techniqueData()
+technique_graphs()
 
 #%% 
 # sns.set_theme()
