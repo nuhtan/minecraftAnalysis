@@ -44,10 +44,8 @@ pub fn simulation_ui(
                         state.items[loc].exposed = exposed;
                         state.items[loc].lava = lava;
                         state.items[loc].ores = ores;
-                        terminal.clear().unwrap();
                     }
                     ProgramStatus::FinishSim(id) => {
-                        println!("Finish message");
                         let mut loc = 0;
                         for i in 0..state.items.len() {
                             if state.items[i].id == id {
