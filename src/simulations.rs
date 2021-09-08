@@ -60,6 +60,7 @@ pub fn simulate_range(
         let file_name = f_name.clone();
         let tech = t.clone();
         let results = simulate(file_name, tech, y, id, sender.clone());
+        sender.send(ProgramStatus::FinishSim(id)).unwrap();
         csv_writer
             .write_record(&[
                 y.to_string(),
@@ -121,16 +122,6 @@ pub fn simulate(
     };
     let mut lava = 0;
     let mut ores = Vec::new();
-    sender
-        .send(ProgramStatus::UpdateSim(
-            id,
-            format!("Filtering Blocks"),
-            sim_results.1,
-            sim_results.2,
-            lava as u32,
-            ores.len() as u32,
-        ))
-        .unwrap();
     let valid = get_valid_blocks();
     for block in sim_results.0 {
         if block.block == "lava" || block.block == "flowing_lava" {
@@ -170,7 +161,6 @@ pub fn simulate(
     results.insert(String::from("blocks exposed"), sim_results.2 as i32);
     results.insert(String::from("lava"), lava as i32);
     // println!("Simulation took {} secs", timer.elapsed().as_secs());
-    sender.send(ProgramStatus::FinishSim(id)).unwrap();
     return results;
 }
 
@@ -268,7 +258,6 @@ pub fn chunk_analysis(
             }
         }
     }
-    println!("Took {} ns on avg.", tot_avg / 1024 / ((max - min) as u128));
     sender.send(ProgramStatus::FinishSim(id)).unwrap();
 }
 
