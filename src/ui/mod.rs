@@ -88,7 +88,7 @@ impl Simulation {
             id,
             technique,
             file,
-            activity: String::from("Initializing Simulation"),
+            activity: String::from("Running Simulation"),
             start,
             y,
             mined: 0,
