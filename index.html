@@ -11,6 +11,12 @@
         integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
         crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(function() {
+            $("#holder").load("static/html/home.html")
+        })
+    </script>
+
 </head>
 
 <body>
@@ -25,16 +31,16 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Introduction</a>
+                        <a class="nav-link active" href="" id="home">Introduction</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="static/html/chunks.html">Chunks</a>
+                        <a class="nav-link" href="" id="chunks">Chunks</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="static/html/techniques.html">Techniques</a>
+                        <a class="nav-link" href="" id="techniques">Techniques</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="static/html/conclusion.html">Conclusion</a>
+                        <a class="nav-link" href="" id="conclusion">Conclusion</a>
                     </li>
                 </ul>
             </div>
@@ -47,7 +53,22 @@
 </body>
 
 <script>
-    $('#holder').load("static/html/home.html");
+    $('.nav-link').click(function (e) {
+        e.preventDefault();
+        $('.nav-link').removeClass('active')
+        $(e.currentTarget).addClass('active')
+        $('#holder').load(`static/html/${e.currentTarget.id}.html`)
+    })
+
+    $('.navbar-brand').click(function (e) {
+        e.preventDefault();
+        $('.nav-link').removeClass('active')
+        $('#home').addClass('active')
+        $('#holder').load(`static/html/home.html`)
+    })
+
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 </html>
