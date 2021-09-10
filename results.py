@@ -37,7 +37,7 @@ def chunk_data():
 
 
     air = container["air"];
-    air.to_csv("results/chunks_air_full_range.csv")
+    air.to_csv("results/chunks_air_full_range.csv", index=False)
     for subset in container:
         blockData = container[subset]
         blockData[blockData['y'] <= 65].to_csv("results/" + subset + "_chunks.csv", index=False)
@@ -112,10 +112,10 @@ def technique_graphs():
             else:
                 plt.savefig("graphical_results/poke_" + filename.split("_")[0] + ".png")
 
-# chunk_data()            
+chunk_data()            
 # chunk_graphs()
 # techniqueData()
-technique_graphs()
+# technique_graphs()
 
 #%% 
 # sns.set_theme()
